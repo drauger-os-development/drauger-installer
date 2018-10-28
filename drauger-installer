@@ -25,7 +25,7 @@ zenity --question --no-wrap
 x="$?"
 if [ "$x" == "0" ]; then
 	({
-		pkexec apt install "$install" | zenity --progress --pulsate --auto-close --no-cancel --time-remaining
+		pkexec apt install "$install" | zenity --progress --pulsate --auto-close --no-cancel --time-remaining --text="Installing . . ."
 	} && {
 		notify-send "Your app has been installed"
 	}) || {
