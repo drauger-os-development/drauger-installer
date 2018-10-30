@@ -20,6 +20,19 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
+if [ "$1" == "--version" ]; then
+	echo "drauger-installer version 0.0.4"
+	exit 0
+fi
+if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+	echo -e "\nJust run drauger-installer to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
+	exit 0
+fi
+if $(echo "$1" | grep -q '.deb') && $(echo "$1" | grep -q '/'); then
+	( sudo apt install "$1" && exit 0 ) || exit 2
+elif $(echo "$1" | grep -q '.deb'); then
+	( sudo apt install ./"$1" && exit 0 ) || exit 2
+fi
 install=$(zenity --file-selection --file-filter=*.deb)
 zenity --question --no-wrap
 x="$?"
