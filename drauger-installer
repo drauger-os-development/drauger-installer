@@ -38,17 +38,20 @@ zenity --info --text="Welcome to Drauger Installer! In the following screen, ple
 install=$(zenity --file-selection --file-filter=*.deb)
 if [ "$?" == "1" ]; then
 	exit 1
+else
+	
+	pak=$(dpkg-deb -f $install Package)
+	des=$(dpkg-deb -f $install Description)
+	info="Package: $pak 
+
+Description: $des"
+	echo $info
 fi
-zenity --question --no-wrap
+
+zenity --question --no-wrap --text="Package Info:\n\n$info\n\nWould you like to install this package?"
 x="$?"
 if [ "$x" == "0" ]; then
-	{{
-		pkexec apt install "$install" | zenity --progress --pulsate --auto-close --no-cancel --time-remaining --text="Installing . . ."
-	} && {
-		notify-send "Your app has been installed"
-	}} || {
-		zenity --error --no-wrap --text="An error was encountered installing your app. Error code $? was thrown from apt."
-	}
+	( pkexec apt install "$install" | zenity --progress --pulsate --auto-close --no-cancel --time-remaining --text="Installing . . ." && notify-send "Your app has been installed" ) || zenity --error --no-wrap --text="An error was encountered installing your app. Error code $? was thrown from apt."
 else
 	exit 1
 fi
