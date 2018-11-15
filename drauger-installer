@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.0.6"
+version="0.0.7"
 if [ "$1" == "--version" ]; then
 	echo -e "\ndrauger-installer version $version\n"
 	exit 0
@@ -30,9 +30,41 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 	exit 0
 fi
 if $(echo "$1" | grep -q '.deb') && $(echo "$1" | grep -q '/'); then
-	( sudo apt install "$1" && exit 0 ) || exit 2
+	pak=$(dpkg-deb -f $1 Package)
+	des=$(dpkg-deb -f $1 Description)
+	info="Package: $pak
+
+Description: $des
+
+"
+	read -p "$info Would you like to install this package? [y/N]: " ans
+	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
+		{ 
+			sudo apt install "$1" && echo -e "\n$pak has been installed\n"
+		} && {
+			exit 0
+		} || exit 2
+	else
+		exit 1
+	fi
 elif $(echo "$1" | grep -q '.deb'); then
-	( sudo apt install ./"$1" && exit 0 ) || exit 2
+	pak=$(dpkg-deb -f $1 Package)
+	des=$(dpkg-deb -f $1 Description)
+	info="Package: $pak
+
+Description: $des
+
+"
+	read -p "$info Would you like to install this package? [y/N]: " ans
+	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
+		{ 
+			sudo apt install ./"$1" && echo -e "\n$pak has been installed\n"
+		} && {
+			exit 0
+		} || exit 2
+	else
+		exit 1
+	fi
 fi
 zenity --info --text="Welcome to Drauger Installer! In the following screen, please navigate to the *.deb file you wish to install, select it, then hit \"Ok\"" --no-wrap
 install=$(zenity --file-selection --file-filter=*.deb)
@@ -51,7 +83,7 @@ fi
 zenity --question --no-wrap --text="Package Info:\n\n$info\n\nWould you like to install this package?"
 x="$?"
 if [ "$x" == "0" ]; then
-	( pkexec apt install "$install" | zenity --progress --pulsate --auto-close --no-cancel --time-remaining --text="Installing . . ." && notify-send "Your app has been installed" ) || zenity --error --no-wrap --text="An error was encountered installing your app. Error code $? was thrown from apt."
+	( pkexec apt install "$install" | zenity --progress --pulsate --auto-close --no-cancel --text="Installing $pak . . ." && notify-send "$pak has been installed" ) || zenity --error --no-wrap --text="An error was encountered installing your app. Error code $? was thrown from apt."
 else
 	exit 1
 fi
