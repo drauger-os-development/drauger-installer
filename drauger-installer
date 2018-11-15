@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.0.7"
+version="0.0.8"
 if [ "$1" == "--version" ]; then
 	echo -e "\ndrauger-installer version $version\n"
 	exit 0
@@ -31,8 +31,11 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 fi
 if $(echo "$1" | grep -q '.deb') && $(echo "$1" | grep -q '/'); then
 	pak=$(dpkg-deb -f $1 Package)
+	ver=$(dpkg-deb -f $1 version)
 	des=$(dpkg-deb -f $1 Description)
 	info="Package: $pak
+
+Version: $ver
 
 Description: $des
 
@@ -49,8 +52,11 @@ Description: $des
 	fi
 elif $(echo "$1" | grep -q '.deb'); then
 	pak=$(dpkg-deb -f $1 Package)
+	ver=$(dpkg-deb -f $1 version)
 	des=$(dpkg-deb -f $1 Description)
 	info="Package: $pak
+
+Version: $ver
 
 Description: $des
 
@@ -73,8 +79,11 @@ if [ "$?" == "1" ]; then
 else
 	
 	pak=$(dpkg-deb -f $install Package)
+	ver=$(dpkg-deb -f $1 version)
 	des=$(dpkg-deb -f $install Description)
 	info="Package: $pak 
+
+Version: $ver
 
 Description: $des"
 	echo $info
