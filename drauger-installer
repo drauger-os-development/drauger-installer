@@ -79,7 +79,7 @@ if [ "$?" == "1" ]; then
 else
 	
 	pak=$(dpkg-deb -f $install Package)
-	ver=$(dpkg-deb -f $1 Version)
+	ver=$(dpkg-deb -f $install Version)
 	des=$(dpkg-deb -f $install Description)
 	info="Package: $pak 
 
