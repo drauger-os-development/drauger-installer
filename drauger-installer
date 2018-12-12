@@ -33,9 +33,12 @@ if $(echo "$1" | grep -q '.deb') && $(echo "$1" | grep -q '/'); then
 	pak=$(dpkg-deb -f $1 Package)
 	ver=$(dpkg-deb -f $1 Version)
 	des=$(dpkg-deb -f $1 Description)
+	dep=$(dpkg-deb -f $1 Depends)
 	info="Package: $pak
 
 Version: $ver
+
+Depends: $dep
 
 Description: $des
 
@@ -54,9 +57,12 @@ elif $(echo "$1" | grep -q '.deb'); then
 	pak=$(dpkg-deb -f $1 Package)
 	ver=$(dpkg-deb -f $1 Version)
 	des=$(dpkg-deb -f $1 Description)
+	dep=$(dpkg-deb -f $1 Depends)
 	info="Package: $pak
 
 Version: $ver
+
+Depends: $dep
 
 Description: $des
 
@@ -81,12 +87,14 @@ else
 	pak=$(dpkg-deb -f $install Package)
 	ver=$(dpkg-deb -f $install Version)
 	des=$(dpkg-deb -f $install Description)
+	dep=$(dpkg-deb -f $install Depends)
 	info="Package: $pak 
 
 Version: $ver
 
+Depends: $dep
+
 Description: $des"
-	echo $info
 fi
 
 zenity --question --no-wrap --text="Package Info:\n\n$info\n\nWould you like to install this package?"
