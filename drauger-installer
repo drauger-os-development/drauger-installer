@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.1.1"
+version="0.1.2"
 if [ "$1" == "--version" ]; then
 	echo -e "\ndrauger-installer version $version\n"
 	exit 0
@@ -43,10 +43,17 @@ Depends: $dep
 Description: $des
 
 "
-	read -p "$info Would you like to install this package? [y/N]: " ans
+	if $(dpkg -l "$pak" | grep -q "$pak");
+		action="update"
+		actioned="updated"
+	else
+		action="install"
+		actioned="installed"
+	fi
+	read -p "$info Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
-			sudo apt -y install "$1" && echo -e "\n$pak has been installed\n"
+			sudo apt -y install "$1" && echo -e "\n$pak has been $actioned\n"
 		} && {
 			exit 0
 		} || exit 2
@@ -67,10 +74,17 @@ Depends: $dep
 Description: $des
 
 "
-	read -p "$info Would you like to install this package? [y/N]: " ans
+	if $(dpkg -l "$pak" | grep -q "$pak");
+		action="update"
+		actioned="updated"
+	else
+		action="install"
+		actioned="installed"
+	fi
+	read -p "$info Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
-			sudo apt -y install ./"$1" && echo -e "\n$pak has been installed\n"
+			sudo apt -y install ./"$1" && echo -e "\n$pak has been $actioned\n"
 		} && {
 			exit 0
 		} || exit 2
@@ -96,11 +110,17 @@ Depends: $dep
 
 Description: $des"
 fi
-
-zenity --question --no-wrap --text="Package Info:\n\n$info\n\nWould you like to install this package?"
+if $(dpkg -l "$pak" | grep -q "$pak");
+		action="update"
+		actioned="updated"
+	else
+		action="install"
+		actioned="installed"
+	fi
+zenity --question --no-wrap --text="Package Info:\n\n$info\n\nWould you like to $action this package?"
 x="$?"
 if [ "$x" == "0" ]; then
-	( pkexec apt -y install "$install" | zenity --progress --pulsate --auto-close --no-cancel --text="Installing $pak . . ." && notify-send "$pak has been installed" ) || zenity --error --no-wrap --text="An error was encountered installing your app. Error code $? was thrown from apt."
+	( pkexec apt -y install "$install" | zenity --progress --pulsate --auto-close --no-cancel --text="Installing $pak . . ." && notify-send "$pak has been $actioned" ) || zenity --error --no-wrap --text="An error was encountered installing your app. Error code $? was thrown from apt."
 else
 	exit 1
 fi
