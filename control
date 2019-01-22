@@ -1,0 +1,11 @@
+Package: drauger-installer
+Version: 0.1.5
+Installed-Size: 64
+Maintainer: Thomas Castleman <draugeros@gmail.com>
+Section: admin
+Architecture: all
+Priority: optional
+Depends: zenity (>=3.28.1), apt (>=1.6.6)
+Description: Gdebi alternative for Drauger OS
+ drauger-installer is a Gdebi alternative for Drauger OS and other Debian based systems on which GDebi does not work. It is a simple script and can easily be hacked to do more or less if the user so desires.
+

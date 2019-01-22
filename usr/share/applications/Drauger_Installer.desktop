@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Drauger Installer
+Version=1.0
+Exec=/bin/drauger-installer
+Icon=/usr/share/icons/Drauger/720x720/Menus/drauger_os-logo.png
+Type=Application
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=PackageManager;Application;System;
