@@ -3,7 +3,7 @@
 #
 #  drauger-installer
 #  
-#  Copyright 2018 Thomas Castleman <draugeros@gmail.com>
+#  Copyright 2019 Thomas Castleman <draugeros@gmail.com>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.1.5"
+version="0.1.7"
 if [ "$1" == "--version" ]; then
 	echo -e "\ndrauger-installer version $version\n"
 	exit 0
@@ -50,6 +50,7 @@ Description: $des
 		action="install"
 		actioned="installed"
 	fi
+	info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
 	read -p "$info Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
@@ -81,6 +82,7 @@ Description: $des
 		action="install"
 		actioned="installed"
 	fi
+	info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
 	read -p "$info Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
@@ -119,7 +121,8 @@ if $(dpkg -l "$pak" | grep -q "$pak"); then
 		actioned="installed"
 		actioning="Installing"
 	fi
-zenity --question --no-wrap --text="Package Info:\n\n$info\n\nWould you like to $action this package?"
+info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
+zenity --question --icon-name=install --no-wrap --text="Package Info:\n\n$info\n\nWould you like to $action this package?"
 x="$?"
 if [ "$x" == "0" ]; then
 	( pkexec apt -y install "$install" | zenity --progress --pulsate --auto-close --no-cancel --text="$actioning $pak . . ." && notify-send "$pak has been $actioned" ) || zenity --error --no-wrap --text="An error was encountered $actioning your app. Error code $? was thrown from apt."
