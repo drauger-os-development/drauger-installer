@@ -8,3 +8,4 @@ Terminal=false
 StartupNotify=true
 Encoding=UTF-8
 Categories=PackageManager;Application;System;
+Comment=Install software from downloaded *.deb files
