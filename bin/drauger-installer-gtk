@@ -30,7 +30,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 	exit 0
 fi
 install="$1"
-if [ -z ${install+x} ]; then
+if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ] ; then
 	zenity --info --text="Welcome to Drauger Installer! In the following screen, please navigate to the *.deb file you wish to install, select it, then hit \"Ok\"" --no-wrap
 	install=$(zenity --file-selection --file-filter=*.deb)
 fi
