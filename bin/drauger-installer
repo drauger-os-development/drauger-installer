@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.1.8"
+version="0.1.9"
 if [ "$1" == "--version" ]; then
 	echo -e "\ndrauger-installer version $version\n"
 	exit 0
