@@ -32,8 +32,10 @@ fi
 install="$1"
 echo "$install" | grep -q '.deb'
 if [ "$?" == "0" ]; then
-	python3 /etc/drauger-installer/splash.py
-	install=$(zenity --file-selection --file-filter=*.deb)
+	install=$(python3 /etc/drauger-installer/splash.py)
+	if [ "$install" == "2" ]; then
+		exit
+	fi
 fi
 if [ "$?" == "1" ]; then
 	exit 1
