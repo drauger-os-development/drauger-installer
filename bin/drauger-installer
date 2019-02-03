@@ -68,6 +68,10 @@ Description: $des
 elif $(echo "$1" | grep -q '.deb'); then
 	pak=$(dpkg-deb -f $1 Package)
 	ver=$(dpkg-deb -f $1 Version)
+	if [ "$(dpkg -s "$pak" | grep 'Version: ' | sed 's/Version: //g')" == "$ver" ]; then
+		echo "This version of $pak is already installed."
+		exit 1
+	fi
 	des=$(dpkg-deb -f $1 Description)
 	dep=$(dpkg-deb -f $1 Depends)
 	info="Package: $pak
