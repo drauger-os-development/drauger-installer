@@ -55,7 +55,8 @@ Description: $des
 		actioned="installed"
 	fi
 	info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
-	read -p "$info Would you like to $action this package? [y/N]: " ans
+	read -p "$info
+Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
 			sudo apt -y install "$1" && echo -e "\n$pak has been $actioned\n"
@@ -91,7 +92,8 @@ Description: $des
 		actioned="installed"
 	fi
 	info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
-	read -p "$info Would you like to $action this package? [y/N]: " ans
+	read -p "$info
+Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
 			sudo apt -y install ./"$1" && echo -e "\n$pak has been $actioned\n"
