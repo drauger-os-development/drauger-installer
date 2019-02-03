@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  error.py
+#  error_ver.py
 #  
 #  Copyright 2019 Thomas Castleman <draugeros@gmail.com>
 #  
@@ -26,8 +26,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from sys import argv
 
-actioning=argv[1]
-error_code=argv[2]
+pak=argv[1]
 
 class error(Gtk.Window):
 	def __init__(self):
@@ -37,8 +36,8 @@ class error(Gtk.Window):
 
 			self.label = Gtk.Label()
 			self.label.set_markup("""
-	An error was encountered %s your app. Error code %s was thrown from apt	
-	""" % (actioning, error_code))
+	This version of %s is already installed.	
+	""" % (pak))
 			self.label.set_justify(Gtk.Justification.CENTER)
 			self.grid.attach(self.label, 1, 1, 8, 1)
 			
