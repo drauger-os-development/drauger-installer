@@ -40,6 +40,10 @@ else
 	
 	pak=$(dpkg-deb -f $install Package)
 	ver=$(dpkg-deb -f $install Version)
+	if [ "$(dpkg -s "$pak" | grep 'Version: ' | sed 's/Version: //g')" == "$ver" ]; then
+		zenity --error --no-wrap --text="This version of $pak is already installed."
+		exit 1
+	fi
 	des=$(dpkg-deb -f $install Description)
 	dep=$(dpkg-deb -f $install Depends)
 	info="Package: $pak 
