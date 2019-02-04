@@ -66,7 +66,7 @@ else
 	actioned="installed"
 	actioning="Installing"
 fi
-info=$(echo "$info" | awk '{gsub(/.{125}/,"&\t\n\t")}1')
+info=$(echo "$info" | awk '{gsub(/.{125}/,"& \t \n \t")}1')
 python3 /etc/drauger-installer/confirm.py "$info" "$action"
 x="$?"
 if [ "$x" == "0" ]; then
