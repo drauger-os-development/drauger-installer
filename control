@@ -1,5 +1,6 @@
 Package: drauger-installer
-Version: 0.2.7-test
+Version: 0.2.1
+Installed-Size: 64
 Maintainer: Thomas Castleman <draugeros@gmail.com>
 Section: admin
 Architecture: all
