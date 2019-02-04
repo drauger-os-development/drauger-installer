@@ -37,13 +37,13 @@ class confirm(Gtk.Window):
 
 			self.label = Gtk.Label()
 			self.label.set_markup("""
-Package Info:
+	Package Info:
 
 	%s
 	
-Would you like to %s this package?
+	Would you like to %s this package?
 	""" % (info, action))
-			self.label.set_justify(Gtk.Justification.CENTER)
+			self.label.set_justify(Gtk.Justification.LEFT)
 			self.grid.attach(self.label, 1, 1, 8, 1)
 			
 			self.button1 = Gtk.Button.new_with_label("YES")
