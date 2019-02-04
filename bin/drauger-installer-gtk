@@ -30,8 +30,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 	exit 0
 fi
 install="$1"
-echo "$install" | grep -q '.deb'
-if [ "$?" == "0" ]; then
+if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ] ; then
 	install=$(python3 /etc/drauger-installer/splash.py)
 	if [ "$install" == "2" ]; then
 		exit
