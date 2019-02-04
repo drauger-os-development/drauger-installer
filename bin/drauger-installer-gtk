@@ -48,6 +48,7 @@ else
 		exit 1
 	fi
 	des=$(dpkg-deb -f $install Description)
+	des=$(echo "$des" | awk '{gsub(/\n/,"&\t")}1')
 	dep=$(dpkg-deb -f $install Depends)
 	info="Package: $pak 
 
