@@ -20,24 +20,24 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.1"
+version="0.2.2"
 if [ "$1" == "--version" ]; then
-	echo -e "\ndrauger-installer version $version\n"
+	/bin/echo -e "\ndrauger-installer version $version\n"
 	exit 0
 fi
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
-	echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
+	/bin/echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
 	exit 0
 fi
-if $(echo "$1" | grep -q '.deb') && $(echo "$1" | grep -q '/'); then
-	pak=$(dpkg-deb -f $1 Package)
-	ver=$(dpkg-deb -f $1 Version)
-	if [ "$(dpkg -s "$pak" | grep 'Version: ' | sed 's/Version: //g')" == "$ver" ]; then
-		echo "This version of $pak is already installed."
+if $(/bin/echo "$1" | /bin/grep -q '.deb') && $(/bin/echo "$1" | /bin/grep -q '/'); then
+	pak=$(/usr/bin/dpkg-deb -f $1 Package)
+	ver=$(/usr/bin/dpkg-deb -f $1 Version)
+	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+		/bin/echo "This version of $pak is already installed."
 		exit 1
 	fi
-	des=$(dpkg-deb -f $1 Description)
-	dep=$(dpkg-deb -f $1 Depends)
+	des=$(/usr/bin/dpkg-deb -f $1 Description)
+	dep=$(/usr/bin/dpkg-deb -f $1 Depends)
 	info="Package: $pak
 
 Version: $ver
@@ -47,34 +47,34 @@ Depends: $dep
 Description: $des
 
 "
-	if $(dpkg -l "$pak" | grep -q "$pak"); then
+	if $(/usr/bin/dpkg -l "$pak" | /bin/grep -q "$pak"); then
 		action="update"
 		actioned="updated"
 	else
 		action="install"
 		actioned="installed"
 	fi
-	info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
+	info=$(/bin/echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
 	read -p "$info
 Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
-			sudo apt -y install "$1" && echo -e "\n$pak has been $actioned\n"
+			/usr/bin/sudo /usr/bin/apt -y install "$1" && /bin/echo -e "\n$pak has been $actioned\n"
 		} && {
 			exit 0
 		} || exit 2
 	else
 		exit 1
 	fi
-elif $(echo "$1" | grep -q '.deb'); then
-	pak=$(dpkg-deb -f $1 Package)
-	ver=$(dpkg-deb -f $1 Version)
-	if [ "$(dpkg -s "$pak" | grep 'Version: ' | sed 's/Version: //g')" == "$ver" ]; then
-		echo "This version of $pak is already installed."
+elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
+	pak=$(/usr/bin/dpkg-deb -f $1 Package)
+	ver=$(/usr/bin/dpkg-deb -f $1 Version)
+	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+		/bin/echo "This version of $pak is already installed."
 		exit 1
 	fi
-	des=$(dpkg-deb -f $1 Description)
-	dep=$(dpkg-deb -f $1 Depends)
+	des=$(/usr/bin/dpkg-deb -f $1 Description)
+	dep=$(/usr/bin/dpkg-deb -f $1 Depends)
 	info="Package: $pak
 
 Version: $ver
@@ -84,19 +84,19 @@ Depends: $dep
 Description: $des
 
 "
-	if $(dpkg -l "$pak" | grep -q "$pak"); then
+	if $(/usr/bin/dpkg -l "$pak" | /bin/grep -q "$pak"); then
 		action="update"
 		actioned="updated"
 	else
 		action="install"
 		actioned="installed"
 	fi
-	info=$(echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
+	info=$(/bin/echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
 	read -p "$info
 Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
-			sudo apt -y install ./"$1" && echo -e "\n$pak has been $actioned\n"
+			/usr/bin/sudo /usr/bin/apt -y install ./"$1" && /bin/echo -e "\n$pak has been $actioned\n"
 		} && {
 			exit 0
 		} || exit 2
