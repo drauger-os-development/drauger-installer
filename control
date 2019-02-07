@@ -1,7 +1,6 @@
 Package: drauger-installer
 Version: 0.2.2
-Installed-Size: 64
-Maintainer: Thomas Castleman <draugeros@gmail.com>
+Maintainer: Thomas Castleman <contact@draugeros.ml>
 Section: admin
 Architecture: all
 Priority: optional
