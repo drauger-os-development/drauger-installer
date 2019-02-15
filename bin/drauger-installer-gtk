@@ -3,7 +3,7 @@
 #
 #  drauger-installer-gtk
 #  
-#  Copyright 2019 Thomas Castleman <draugeros@gmail.com>
+#  Copyright 2019 Thomas Castleman <contact@draugeros.ml>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.3"
+version="0.2.4"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -31,7 +31,8 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 fi
 install="$1"
 if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ] ; then
-	install=$(/usr/bin/python3 /etc/drauger-installer/splash.py)
+	install=$(/usr/bin/python3 /etc/drauger-installer/splash.py 2>&1 >/dev/null)
+	echo "$install"
 	check="$?"
 	if [ "$check" == "2" ]; then
 		exit 2
