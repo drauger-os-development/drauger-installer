@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.2"
+version="0.2.3"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -34,22 +34,22 @@ if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ] ; then
 	install=$(/usr/bin/python3 /etc/drauger-installer/splash.py)
 	check="$?"
 	if [ "$check" == "2" ]; then
-		exit
+		exit 2
 	fi
 fi
 if [ "$?" == "1" ]; then
 	exit 1
 else
 	
-	pak=$(/usr/bin/dpkg-deb -f $install Package)
-	ver=$(/usr/bin/dpkg-deb -f $install Version)
+	pak=$(/usr/bin/dpkg-deb -f "$install" Package)
+	ver=$(/usr/bin/dpkg-deb -f "$install" Version)
 	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/usr/bin/python3 /etc/drauger-installer/error_ver.py "$pak"
 		exit 1
 	fi
-	des=$(/usr/bin/dpkg-deb -f $install Description)
+	des=$(/usr/bin/dpkg-deb -f "$install" Description)
 	des=$(/bin/echo "$des" | /usr/bin/awk '{gsub(/\n/,"&\t")}1')
-	dep=$(/usr/bin/dpkg-deb -f $install Depends)
+	dep=$(/usr/bin/dpkg-deb -f "$install" Depends)
 	info="Package: $pak 
 
 	Version: $ver
