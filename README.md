@@ -1,7 +1,7 @@
 ## **drauger-installer** ##
 #### By: Thomas Castleman
 #### Lead Dev, Drauger OS
-#### <druageros@gmail.com>
+#### <contact@draugeros.ml>
 #### https://draugeros.ml
 ---
 Gdebi Package Installer alternative for Drauger OS and other Debian based distros
@@ -9,15 +9,14 @@ Gdebi Package Installer alternative for Drauger OS and other Debian based distro
 # Dependencies
 
 `apt`
-`zenity`
+`python-gtk2`
+`python3`
+`bash`
+`dpkg`
 
 # Installing
 
-If from GitHub:
-
 Install the \*.deb in the `releases` section
-
-From \*.deb:
 
 run `sudo apt install ./drauger-installer_(version)_all.deb` in the directroy you have downloaded the \*.deb file to. This will add a desktop file to `/usr/share/applications` to make Drauger Installer show up in your app menu, no matter what your desktop environment.
 
