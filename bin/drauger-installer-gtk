@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.6"
+version="0.2.7"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -51,24 +51,56 @@ else
 	des=$(/usr/bin/dpkg-deb -f "$install" Description)
 	des=$(/bin/echo "$des" | /usr/bin/awk '{gsub(/\n/,"&\t")}1')
 	dep=$(/usr/bin/dpkg-deb -f "$install" Depends)
+	brk=$(/usr/bin/dpkg-deb -f "$install" Breaks)
 	#filter out already installed deps
 	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
 	for each in $deplist; do
-		if $(/usr/bin/dpkg -s "$each" | /bin/grep -q "dpkg-query: no packages found matching $each"); then
+		if $(/usr/bin/dpkg -l "$each" 2>&1 | /bin/grep -q "dpkg-query: no packages found matching $each"); then
 			continue
 		else
-			dep=$(/bin/echo "$dep" | /bin/sed "s/$each ([^)(]*)\, //")
+			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each //")
 		fi
 	done
+	if [ "$deplist" == "" ] || [ "$deplist" == " " ]; then
+		dep="None"
+	else
+		dep="$deplist"
+	fi
+	x=1
+	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
+	while [ "$x" != "0" ]; do
+		if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+			brk="None"
+			x="0"
+			break
+		elif [ "$x" != "2" ]; then
+			for each in $brklist; do
+				if $(/usr/bin/dpkg -l "$each" 2>&1 | /bin/grep -q "dpkg-query: no packages found matching $each"); then
+					brklist=$(/bin/echo "$brklist" | /bin/sed "s/$each //")
+				else
+					continue
+				fi
+			done
+			x="2"
+		else
+			x="0"
+			break
+		fi
+	done
+	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+		brk="None"
+	fi
 	info="Package: $pak 
 
 	Version: $ver
 
 	Needed Dependencies: $dep
 
+	Conflicts: $brk
+
 	Description: $des"
 fi
-if $(/usr/bin/dpkg -l "$pak" | /bin/grep -q "$pak"); then
+if $(/usr/bin/dpkg -l "$pak" 2>/dev/null| /bin/grep -q "$pak"); then
 	action="update"
 	actioned="updated"
 	actioning="Updating"

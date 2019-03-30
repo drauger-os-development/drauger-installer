@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.6"
+version="0.2.7"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer version $version\n"
 	exit 0
@@ -32,31 +32,63 @@ fi
 if $(/bin/echo "$1" | /bin/grep -q '.deb') && $(/bin/echo "$1" | /bin/grep -q '/'); then
 	pak=$(/usr/bin/dpkg-deb -f $1 Package)
 	ver=$(/usr/bin/dpkg-deb -f $1 Version)
-	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+	if [ "$(/usr/bin/dpkg -s $pak 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/bin/echo "This version of $pak is already installed."
 		exit 1
 	fi
-	des=$(/usr/bin/dpkg-deb -f $1 Description)
-	dep=$(/usr/bin/dpkg-deb -f $1 Depends)
+	des=$(/usr/bin/dpkg-deb -f "$1" Description)
+	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
+	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
 	#filter out already installed deps
 	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
 	for each in $deplist; do
-		if $(/usr/bin/dpkg -s "$each" | /bin/grep -q "dpkg-query: no packages found matching $each"); then
+		if $(/usr/bin/dpkg -l "$each" 2>&1 | /bin/grep -q "dpkg-query: no packages found matching $each"); then
 			continue
 		else
-			dep=$(/bin/echo "$dep" | /bin/sed "s/$each ([^)(]*)\, //")
+			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each //")
 		fi
 	done
+	if [ "$deplist" == "" ] || [ "$deplist" == " " ]; then
+		dep="None"
+	else
+		dep="$deplist"
+	fi
+	x=1
+	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
+	while [ "$x" != "0" ]; do
+		if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+			brk="None"
+			x="0"
+			break
+		elif [ "$x" != "2" ]; then
+			for each in $brklist; do
+				if $(/usr/bin/dpkg -l "$each" 2>&1 | /bin/grep -q "dpkg-query: no packages found matching $each"); then
+					brklist=$(/bin/echo "$brklist" | /bin/sed "s/$each //")
+				else
+					continue
+				fi
+			done
+			x="2"
+		else
+			x="0"
+			break
+		fi
+	done
+	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+		brk="None"
+	fi
 	info="Package: $pak
 
 Version: $ver
 
-Depends: $dep
+Needed Dependencies: $dep
+
+Conflicts: $brk
 
 Description: $des
 
 "
-	if $(/usr/bin/dpkg -l "$pak" | /bin/grep -q "$pak"); then
+	if $(/usr/bin/dpkg -l "$pak" 2>/dev/null | /bin/grep -q "$pak"); then
 		action="update"
 		actioned="updated"
 	else
@@ -64,7 +96,9 @@ Description: $des
 		actioned="installed"
 	fi
 	info=$(/bin/echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
-	read -p "$info
+	read -p "
+$info
+
 Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
@@ -76,24 +110,65 @@ Would you like to $action this package? [y/N]: " ans
 		exit 1
 	fi
 elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
-	pak=$(/usr/bin/dpkg-deb -f $1 Package)
-	ver=$(/usr/bin/dpkg-deb -f $1 Version)
-	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+	pak=$(/usr/bin/dpkg-deb -f "$1" Package)
+	ver=$(/usr/bin/dpkg-deb -f "$1" Version)
+	if [ "$(/usr/bin/dpkg -s $pak 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/bin/echo "This version of $pak is already installed."
 		exit 1
 	fi
-	des=$(/usr/bin/dpkg-deb -f $1 Description)
-	dep=$(/usr/bin/dpkg-deb -f $1 Depends)
+	des=$(/usr/bin/dpkg-deb -f "$1" Description)
+	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
+	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
+	#filter out already installed deps
+	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
+	for each in $deplist; do
+		if $(/usr/bin/dpkg -l "$each" 2>&1 | /bin/grep -q "dpkg-query: no packages found matching $each"); then
+			continue
+		else
+			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each //")
+		fi
+	done
+	if [ "$deplist" == "" ] || [ "$deplist" == " " ]; then
+		dep="None"
+	else
+		dep="$deplist"
+	fi
+	x=1
+	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
+	while [ "$x" != "0" ]; do
+		if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+			brk="None"
+			x="0"
+			break
+		elif [ "$x" != "2" ]; then
+			for each in $brklist; do
+				if $(/usr/bin/dpkg -l "$each" 2>&1 | /bin/grep -q "dpkg-query: no packages found matching $each"); then
+					brklist=$(/bin/echo "$brklist" | /bin/sed "s/$each //")
+				else
+					continue
+				fi
+			done
+			x="2"
+		else
+			x="0"
+			break
+		fi
+	done
+	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+		brk="None"
+	fi
 	info="Package: $pak
 
 Version: $ver
 
-Depends: $dep
+Needed Dependencies: $dep
+
+Conflicts: $brk
 
 Description: $des
 
 "
-	if $(/usr/bin/dpkg -l "$pak" | /bin/grep -q "$pak"); then
+	if $(/usr/bin/dpkg -l "$pak" 2>/dev/null | /bin/grep -q "$pak"); then
 		action="update"
 		actioned="updated"
 	else
@@ -101,7 +176,9 @@ Description: $des
 		actioned="installed"
 	fi
 	info=$(/bin/echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
-	read -p "$info
+	read -p "
+$info
+
 Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
