@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.9"
+version="0.3.0"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -48,14 +48,13 @@ else
 		/usr/bin/python3 /etc/drauger-installer/error_ver.py "$pak"
 		exit 1
 	fi
-	/usr/bin/notify-send "Loading Info . . ."
 	des=$(/usr/bin/dpkg-deb -f "$install" Description)
 	des=$(/bin/echo "$des" | /usr/bin/awk '{gsub(/\n/,"&\t")}1')
 	dep=$(/usr/bin/dpkg-deb -f "$install" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$install" Breaks)
 	#filter out already installed deps
-	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
-	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
+	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each1 in $deplist; do
 		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
