@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.2.8"
+version="0.2.9"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -58,20 +58,16 @@ else
 	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\, //g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each1 in $deplist; do
-		for each2 in $instlist; do
-			if [ "$each1" == "$each2" ]; then
-				deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each //")
-			fi
-		done
+		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
+			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each //")
+		fi
 	done
 	dep="$deplist"
 	brklistsave=""
 	for each1 in $brklist; do
-		for each2 in $instlist; do
-			if [ "$each1" == "$each2" ]; then
-				brklistsave="$brklistsave $each1"
-			fi
-		done
+		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
+			brklistsave="$brklistsave $each1"
+		fi
 	done
 	brk="$brklistsave"
 	dep="$deplist"
