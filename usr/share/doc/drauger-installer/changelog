@@ -1,0 +1,6 @@
+drauger-installer (0.3.0) bionic; urgency=medium
+
+  * removed useless code
+  * Fixed formatting issue with deps list
+
+ -- Thomas Castleman <contact@draugeros.org>  Sun, 31 Mar 2019 12:40:10 -0500
