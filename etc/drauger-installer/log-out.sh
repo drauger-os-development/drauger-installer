@@ -58,23 +58,24 @@ log () {
 	fi
 	echo -e "$OUTPUT_LOG" >> "$LOG_LOCATION"
 }
+log
 #Determine the extent of the damage
-if [ "$ERROR_CODE" == "1" ]; then
-	#One is normally just a warning or a minor issue. Just report it in the log.
-	log
-else
-	#If it's anything other than 1, we have an issue.
-	#Anything with an output of 0 will not be logging anything, to help with I/O
-	log
-	#Make a crash file in /var/crash
-	NAME=$(echo $SCRIPT_PATH | sed 's/\//_/g')
-	CRASH_FILE="/var/crash/$NAME.1000.crash"
-	if [ "$DRAUGER_OS_VERSION" == "NOT A DRAUGER OS INSTALLATION" ]; then
-		DRAUGER_OS_VERSION=$(lsb_release -d | sed 's/Description:	//')
-	fi
-	ARCH=$(uname -m)
-	TIMESTAMP=$(date +%s)
-	LOCALE=$(locale)
-	OUTPUT_CRASH="ProblemType: Crash\nArchitecture: $ARCH\nCrashCounter: 1\nCurrentDesktop: $XDG_CURRENT_DESKTOP\nDate: $DATE\nDistroRelease: $DRAUGER_OS_VERSION\nExecutablePath: $SCRIPT_PATH\nExecutableTimestamp: $TIMESTAMP\nProcCmdline: $CALL_METHOD\nProcCwd: $PWD\nProcEnviron: \n$LOCALE\nSHELL: $SHELL\n"
-	echo -e "$OUTPUT_CRASH" > "$CRASH_FILE"
-fi
+#if [ "$ERROR_CODE" == "1" ]; then
+#	#One is normally just a warning or a minor issue. Just report it in the log.
+#	log
+#else
+#	#If it's anything other than 1, we have an issue.
+#	#Anything with an output of 0 will not be logging anything, to help with I/O
+#	log
+#	#Make a crash file in /var/crash
+#	NAME=$(echo $SCRIPT_PATH | sed 's/\//_/g')
+#	CRASH_FILE="/var/crash/$NAME.1000.crash"
+#	if [ "$DRAUGER_OS_VERSION" == "NOT A DRAUGER OS INSTALLATION" ]; then
+#		DRAUGER_OS_VERSION=$(lsb_release -d | sed 's/Description:	//')
+#	fi
+#	ARCH=$(uname -m)
+#	TIMESTAMP=$(date +%s)
+#	LOCALE=$(locale)
+#	OUTPUT_CRASH="ProblemType: Crash\nArchitecture: $ARCH\nCrashCounter: 1\nCurrentDesktop: $XDG_CURRENT_DESKTOP\nDate: $DATE\nDistroRelease: $DRAUGER_OS_VERSION\nExecutablePath: $SCRIPT_PATH\nExecutableTimestamp: $TIMESTAMP\nProcCmdline: $CALL_METHOD\nProcCwd: $PWD\nProcEnviron: \n$LOCALE\nSHELL: $SHELL\n"
+#	echo -e "$OUTPUT_CRASH" > "$CRASH_FILE"
+#fi
