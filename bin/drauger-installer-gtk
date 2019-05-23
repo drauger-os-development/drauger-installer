@@ -26,15 +26,13 @@ if [ "$1" == "--version" ]; then
 	exit 0
 fi
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
-	/bin/echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
+	/bin/echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nor, pass drauger-installer the file path to install via a CLI.\n"
 	exit 0
 fi
 install="$1"
 if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ]; then
 	install=$(/usr/bin/python3 /etc/drauger-installer/splash.py 2>/dev/null)
-	echo "$install"
-	check="$?"
-	if [ "$check" == "2" ]; then
+	if [ -z "$check" ]; then
 		exit 2
 	fi
 fi
