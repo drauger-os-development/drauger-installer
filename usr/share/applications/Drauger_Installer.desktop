@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Drauger Installer
-Version=0.3.2
+Version=0.3.3
 Exec=/bin/drauger-installer-gtk %f
-Icon=/usr/share/icons/Drauger/720x720/Menus/install-drauger.svg
+Icon=/usr/share/icons/Drauger/720x720/Menus/install-drauger.png
 Type=Application
 Terminal=false
 StartupNotify=true
