@@ -21,3 +21,6 @@ Install the \*.deb in the `releases` section
 run `sudo apt install ./drauger-installer_(version)_all.deb` in the directroy you have downloaded the \*.deb file to. This will add a desktop file to `/usr/share/applications` to make Drauger Installer show up in your app menu, no matter what your desktop environment.
 
 It should also make it so you can open \*.deb files using Drauger Installer from the right-click menu in your file manager.
+
+# More info
+The `master` branch is for stable releases. If you want a development version, check the `dev-branch` branch.
