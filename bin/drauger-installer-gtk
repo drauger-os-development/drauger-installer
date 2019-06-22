@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.3.4"
+version="0.3.5"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -57,7 +57,7 @@ else
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each1 in $deplist; do
 		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
-			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each //")
+			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each1 //")
 		fi
 	done
 	dep="$deplist"
