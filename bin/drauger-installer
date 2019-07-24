@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.3.5"
+version="0.3.6"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer version $version\n"
 	exit 0
@@ -41,32 +41,30 @@ if $(/bin/echo "$1" | /bin/grep -q '.deb') && $(/bin/echo "$1" | /bin/grep -q '/
 	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
 	#filter out already installed deps
-	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
-	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	dep=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	brk=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
-	for each1 in $deplist; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
-			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each1 //")
+	for each in $dep; do
+		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+			dep=$(/bin/echo "$dep" | /bin/sed "s/$each //")
 		fi
 	done
-	dep="$deplist"
-	brklistsave=""
-	for each1 in $brklist; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
-			brklistsave="$brklistsave $each1"
+	brklist=""
+	for each in $brk; do
+		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+			if [ "$brklist" == "" ]; then
+				brklist="$each"
+			else
+				brklist="$brklist $each"
+			fi
 		fi
 	done
-	brk="$brklistsave"
-	dep="$deplist"
-	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+	brk="$brklist"
+	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ -z "$brk" ]; then
 		brk="None"
-	else
-		brk=$(/bin/echo "$brk" | sed 's/ /, /g')
 	fi
-	if [ "$dep" == "" ] || [ "$dep" == " " ] || [ "$deplist" == "" ] || [ "$deplist" == " " ]; then
+	if [ ! $(/bin/echo "$dep" | egrep -q '[a-zA-Z0-9]') ]; then
 		dep="None"
-	else
-		dep=$(/bin/echo "$dep" | sed 's/ /, /g')
 	fi
 	info="Package: $pak
 
@@ -116,31 +114,30 @@ elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
 	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
 	#filter out already installed deps
-	deplist=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
-	brklist=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	dep=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	brk=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
-	for each1 in $deplist; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
-			deplist=$(/bin/echo "$deplist" | /bin/sed "s/$each1 //")
+	for each in $dep; do
+		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+			dep=$(/bin/echo "$dep" | /bin/sed "s/$each //")
 		fi
 	done
-	dep="$deplist"
-	brklistsave=""
-	for each1 in $brklist; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each1"); then
-			brklistsave="$brklistsave $each1"
+	brklist=""
+	for each in $brk; do
+		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+			if [ "$brklist" == "" ]; then
+				brklist="$each"
+			else
+				brklistsave="$brklist $each"
+			fi
 		fi
 	done
-	brk="$brklistsave"
-	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ "$brklist" == "" ] || [ "$brklist" == " " ]; then
+	brk="$brklist"
+	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ -z "$brk" ]; then
 		brk="None"
-	else
-		brk=$(/bin/echo "$brk" | sed 's/ /, /g')
 	fi
-	if [ "$dep" == "" ] || [ "$dep" == " " ] || [ "$deplist" == "" ] || [ "$deplist" == " " ]; then
+	if [ ! $(/bin/echo "$dep" | egrep -q '[a-zA-Z0-9]') ]; then
 		dep="None"
-	else
-		dep=$(/bin/echo "$dep" | sed 's/ /, /g')
 	fi
 	info="Package: $pak
 
