@@ -21,7 +21,7 @@
 #  MA 02110-1301, USA.
 #
 #version flag
-version="0.3.6"
+version="0.3.7"
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
@@ -36,7 +36,7 @@ install="$1"
 if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ]; then
 	install=$(/usr/bin/python3 /etc/drauger-installer/splash.py 2>/dev/null)
 	if [ -z "$install" ]; then
-		/etc/drauger-installer/log-out.sh 2 /bin/drauger-installer-gtk "/etc/drauger-installer/splash.py exited with nothing on stdout. Most likly killed with no selection."
+		/etc/drauger-installer/log-out 2 /bin/drauger-installer-gtk "/etc/drauger-installer/splash.py exited with nothing on stdout. Most likly killed with no selection." "drauger-installer" "$PWD" "$0"  
 		exit 2
 	fi
 fi
@@ -105,6 +105,6 @@ x="$?"
 if [ "$x" == "0" ]; then
 	( /usr/bin/pkexec /usr/bin/apt -y install "$install" | /usr/bin/zenity --progress --pulsate --auto-close --no-cancel --text="$actioning $pak . . ." && notify-send "$pak has been $actioned" ) || /usr/bin/python3 /etc/drauger-installer/error_inst.py "$actioning" "$?"
 else
-	/etc/drauger-installer/log-out.sh 1 /bin/drauger-installer-gtk "/etc/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled."
+	/etc/drauger-installer/log-out 1 /bin/drauger-installer-gtk "/etc/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled." "drauger-installer" "$PWD" "$0"
 	exit 1
 fi

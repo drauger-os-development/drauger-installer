@@ -1,6 +1,5 @@
-drauger-installer (0.3.6) bionic; urgency=medium
+drauger-installer (0.3.7) bionic; urgency=medium
 
-  * streamlined code
-  * hopefully fixed formatting issue on dep and break output 
+  * updated logging
 
- -- Thomas Castleman <contact@draugeros.org>  Fri, 24 Jul 2019 12:23:02 -0500
+ -- Thomas Castleman <contact@draugeros.org>  Fri, 24 Jul 2019 20:20:00 -0500
