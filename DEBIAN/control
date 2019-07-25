@@ -1,9 +1,9 @@
 Package: drauger-installer
-Version: 0.3.6
+Version: 0.3.7
 Maintainer: Thomas Castleman <contact@draugeros.org>
 Section: admin
 Homepage: https://github.com/drauger-os-development/drauger-installer
-Architecture: all
+Architecture: amd64
 Priority: optional
 Depends: zenity (>=3.28.1), apt (>=1.6.6), python-gtk2 (>=2.24.0-5.1ubuntu2), bash (>=4.4.18-2ubuntu1), drauger-icons (>=0.0.2)
 Description: Gdebi alternative for Drauger OS
