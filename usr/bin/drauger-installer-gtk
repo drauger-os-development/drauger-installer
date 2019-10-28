@@ -21,9 +21,9 @@
 #  MA 02110-1301, USA.
 #
 #version flag
-version="0.4.1"
+version="0.4.2"
 set -o pipefail
-if [ "$1" == "--version" ]; then
+if [ "$1" == "--version" ] || [ "$1" == "-v" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
 fi
@@ -109,7 +109,7 @@ if [ "$x" == "0" ]; then
 		 	/usr/bin/pkexec /usr/bin/apt -y install "$install" | /usr/bin/zenity --progress --pulsate --auto-close --no-cancel --text="$actioning $pak . . ." 
 		 
 		} && {
-			/usr/bin/notify-send --app-name="Drauger Installer" "$pak has been $actioned"
+			/usr/bin/notify-send --icon=/usr/share/icons/Drauger/720x720/Menus/install-drauger.png --app-name="Drauger Installer" "$pak has been $actioned"
 		}
 	} || {
 		/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
