@@ -12,9 +12,9 @@ mkdir ../"$FOLDER"
 #							     #
 #							     #
 ##############################################################
-cd etc/drauger-installer
+cd usr/share/drauger-installer
 g++ -Wall -m64 -o "log-out" "log-out.cxx"
-cd ../..
+cd ../../..
 ##############################################################
 #							     #
 #							     #
@@ -81,8 +81,8 @@ fi
 cp -R DEBIAN ../"$FOLDER"/DEBIAN
 cd ..
 #DELETE STUFF HERE
-rm "$FOLDER"/etc/drauger-installer/log-out.cxx
-rm drauger-installer/etc/drauger-installer/log-out
+rm "$FOLDER"/usr/share/drauger-installer/log-out.cxx
+rm drauger-installer/usr/share/drauger-installer/log-out
 #build the shit
 dpkg-deb --build "$FOLDER"
 rm -rf "$FOLDER"
