@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.3.9"
+version="0.4.0"
 set -o pipefail
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer version $version\n"
@@ -35,7 +35,7 @@ if $(/bin/echo "$1" | /bin/grep -q '.deb') && $(/bin/echo "$1" | /bin/grep -q '/
 	ver=$(/usr/bin/dpkg-deb -f $1 Version)
 	if [ "$(/usr/bin/dpkg -s $pak 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/bin/echo "This version of $pak is already installed."
-		/etc/drauger-installer/log-out 1 /bin/drauger-installer "/bin/drauger-installer detected provided *.deb package was already installed." "drauger-installer" "$PWD" "$0"
+		/usr/share/drauger-installer/log-out 1 /bin/drauger-installer "/bin/drauger-installer detected provided *.deb package was already installed." "drauger-installer" "$PWD" "$0"
 		exit 1
 	fi
 	des=$(/usr/bin/dpkg-deb -f "$1" Description)
@@ -96,11 +96,11 @@ Would you like to $action this package? [y/N]: " ans
 		} && {
 			exit 0
 		} || {
-			/etc/drauger-installer/log-out 2 /bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
+			/usr/share/drauger-installer/log-out 2 /bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
 			exit 2
 		}
 	else
-		/etc/drauger-installer/log-out 1 /bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
+		/usr/share/drauger-installer/log-out 1 /bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
 		exit 1
 	fi
 elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
@@ -108,7 +108,7 @@ elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
 	ver=$(/usr/bin/dpkg-deb -f "$1" Version)
 	if [ "$(/usr/bin/dpkg -s $pak 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/bin/echo "This version of $pak is already installed."
-		/etc/drauger-installer/log-out 1 /bin/drauger-installer "/bin/drauger-installer detected provided *.deb package was already installed." "drauger-installer" "$PWD" "$0"
+		/usr/share/drauger-installer/log-out 1 /bin/drauger-installer "/bin/drauger-installer detected provided *.deb package was already installed." "drauger-installer" "$PWD" "$0"
 		exit 1
 	fi
 	des=$(/usr/bin/dpkg-deb -f "$1" Description)
@@ -169,11 +169,11 @@ Would you like to $action this package? [y/N]: " ans
 		} && {
 			exit 0
 		} || {
-			/etc/drauger-installer/log-out 2 /bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
+			/usr/share/drauger-installer/log-out 2 /bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
 			exit 2
 		}
 	else
-		/etc/drauger-installer/log-out 1 /bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
+		/usr/share/drauger-installer/log-out 1 /bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
 		exit 1
 	fi
 fi
