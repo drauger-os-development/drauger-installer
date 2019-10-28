@@ -37,7 +37,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	if ( argc == 1 )
+	if ( argc <= 1 )
 	{
 		cout << "Nothing to log passed on stdin. Exiting . . ." << endl;
 		return 2;
@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
 	{
 		string SCRIPT_PATH = argv[2];
 		string ERROR_MESSAGE = argv[3];
-		string CALL_METHOD = argv[6];
-		string ERROR_PWD = argv[5];
 		string name = argv[4];
+		string ERROR_PWD = argv[5];
+		string CALL_METHOD = argv[6];
 		string DIR = "/tmp/" + name;
 		string LOG_LOCATION = DIR + "/log.txt";
 		int len = DIR.length();

@@ -21,7 +21,7 @@
 #  MA 02110-1301, USA.
 #
 #version flag
-version="0.4.0"
+version="0.4.1"
 set -o pipefail
 if [ "$1" == "--version" ]; then
 	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
@@ -35,9 +35,9 @@ fi
 #if something is actually going to be installed, this will be ran
 install="$1"
 if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ]; then
-	install=$(/usr/bin/python3 /etc/drauger-installer/splash.py 2>/dev/null)
+	install=$(/usr/bin/python3 /usr/share/drauger-installer/splash.py 2>/dev/null)
 	if [ -z "$install" ]; then
-		/etc/drauger-installer/log-out 2 /bin/drauger-installer-gtk "/etc/drauger-installer/splash.py exited with nothing on stdout. Most likly killed with no selection." "drauger-installer" "$PWD" "$0"  
+		/usr/share/drauger-installer/log-out 2 /usr/bin/drauger-installer-gtk "/usr/share/drauger-installer/splash.py exited with nothing on stdout. Most likly killed with no selection." "drauger-installer" "$PWD" "$0"  
 		exit 2
 	fi
 fi
@@ -48,7 +48,7 @@ else
 	pak=$(/usr/bin/dpkg-deb -f "$install" Package)
 	ver=$(/usr/bin/dpkg-deb -f "$install" Version)
 	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
-		/usr/bin/python3 /etc/drauger-installer/error_ver.py "$pak"
+		/usr/bin/python3 /usr/share/drauger-installer/error_ver.py "$pak"
 		exit 1
 	fi
 	des=$(/usr/bin/dpkg-deb -f "$install" Description)
@@ -101,7 +101,7 @@ else
 	actioning="Installing"
 fi
 info=$(/bin/echo "$info" | /usr/bin/awk '{gsub(/.{125}/,"& \t \n \t")}1')
-/usr/bin/python3 /etc/drauger-installer/confirm.py "$info" "$action"
+/usr/bin/python3 /usr/share/drauger-installer/confirm.py "$info" "$action"
 x="$?"
 if [ "$x" == "0" ]; then
 	{
@@ -112,9 +112,9 @@ if [ "$x" == "0" ]; then
 			/usr/bin/notify-send --app-name="Drauger Installer" "$pak has been $actioned"
 		}
 	} || {
-		/usr/bin/python3 /etc/drauger-installer/error_inst.py "$actioning" "$?"
+		/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
 	}
 else
-	/etc/drauger-installer/log-out 1 /bin/drauger-installer-gtk "/etc/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled." "drauger-installer" "$PWD" "$0"
+	/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer-gtk "/usr/share/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled." "drauger-installer" "$PWD" "$0"
 	exit 1
 fi
