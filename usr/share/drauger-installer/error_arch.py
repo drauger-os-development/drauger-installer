@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  error_ver.py
+#  error_arch.py
 #
 #  Copyright 2020 Thomas Castleman <contact@draugeros.org>
 #
@@ -24,9 +24,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
-from sys import argv
-
-pak=argv[1]
 
 class error(Gtk.Window):
 	def __init__(self):
@@ -36,8 +33,8 @@ class error(Gtk.Window):
 
 			self.label = Gtk.Label()
 			self.label.set_markup("""
-	This version of %s is already installed.
-	""" % (pak))
+	This package is not designed for your CPU Archetecture. It will not run correctly if installed.
+	""")
 			self.label.set_justify(Gtk.Justification.CENTER)
 			self.grid.attach(self.label, 1, 1, 8, 1)
 

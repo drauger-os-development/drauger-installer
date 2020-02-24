@@ -3,7 +3,7 @@
 #
 #  drauger-installer-gtk
 #  
-#  Copyright 2019 Thomas Castleman <contact@draugeros.org>
+#  Copyright 2020 Thomas Castleman <contact@draugeros.org>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@
 #  MA 02110-1301, USA.
 #
 #version flag
-version="0.4.4"
+version="0.4.5"
 set -o pipefail
 if [ "$1" == "--version" ] || [ "$1" == "-v" ]; then
-	/bin/echo -e "\ndrauger-installer-gtk version $version\n"
+	builtin echo -e "\ndrauger-installer-gtk version $version\n"
 	exit 0
 fi
 #help flag
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
-	/bin/echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nor, pass drauger-installer the file path to install via a CLI.\n"
+	builtin echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nor, pass drauger-installer the file path to install via a CLI.\n"
 	exit 0
 fi
 #if something is actually going to be installed, this will be ran
@@ -47,26 +47,32 @@ else
 	
 	pak=$(/usr/bin/dpkg-deb -f "$install" Package)
 	ver=$(/usr/bin/dpkg-deb -f "$install" Version)
+	arch=$(/usr/bin/dpkg-deb -f "$1" Architecture)
+	arch=$(grep -i "$arch" /etc/drauger-installer/arch.conf)
+	arch="$?"
 	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/usr/bin/python3 /usr/share/drauger-installer/error_ver.py "$pak"
 		exit 1
+	elif [ "$arch" != 0 ]; then
+		/usr/bin/python3 /usr/share/drauger-installer/error_arch.py
+		
 	fi
 	des=$(/usr/bin/dpkg-deb -f "$install" Description)
-	des=$(/bin/echo "$des" | /usr/bin/awk '{gsub(/\n/,"&\t")}1')
+	des=$(builtin echo "$des" | /usr/bin/awk '{gsub(/\n/,"&\t")}1')
 	dep=$(/usr/bin/dpkg-deb -f "$install" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$install" Breaks)
 	#filter out already installed deps
-	dep=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
-	brk=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	dep=$(builtin echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	brk=$(builtin echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each in $dep; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
-			dep=$(/bin/echo "$dep" | /bin/sed "s/$each //")
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
+			dep=$(builtin echo "$dep" | /bin/sed "s/$each //")
 		fi
 	done
 	brklist=""
 	for each in $brk; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
 			if [ "$brklist" == "" ]; then
 				brklist="$each"
 			else
@@ -78,7 +84,7 @@ else
 	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ -z "$brk" ]; then
 		brk="None"
 	fi
-	if [ ! $(/bin/echo "$dep" | egrep -q '[a-zA-Z0-9]') ]; then
+	if [ ! $(builtin echo "$dep" | /bin/grep -Eq '[a-zA-Z0-9]') ]; then
 		dep="None"
 	fi
 	info="Package: $pak 
@@ -100,7 +106,7 @@ else
 	actioned="installed"
 	actioning="Installing"
 fi
-info=$(/bin/echo "$info" | /usr/bin/awk '{gsub(/.{125}/,"& \t \n \t")}1')
+info=$(builtin echo "$info" | /usr/bin/awk '{gsub(/.{125}/,"& \t \n \t")}1')
 /usr/bin/python3 /usr/share/drauger-installer/confirm.py "$info" "$action"
 x="$?"
 if [ "$x" == "0" ]; then

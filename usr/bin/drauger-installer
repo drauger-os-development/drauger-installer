@@ -3,7 +3,7 @@
 #
 #  drauger-installer
 #  
-#  Copyright 2019 Thomas Castleman <contact@draugeros.org>
+#  Copyright 2020 Thomas Castleman <contact@draugeros.org>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,39 +20,45 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.4.4"
+version="0.4.5"
 set -o pipefail
 if [ "$1" == "--version" ] || [ "$1" == "-v" ]; then
-	/bin/echo -e "\ndrauger-installer version $version\n"
+	builtin echo -e "\ndrauger-installer version $version\n"
 	exit 0
 fi
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
-	/bin/echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
+	builtin echo -e "\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
 	exit 0
 fi
-if $(/bin/echo "$1" | /bin/grep -q '.deb') && $(/bin/echo "$1" | /bin/grep -q '/'); then
-	pak=$(/usr/bin/dpkg-deb -f $1 Package)
-	ver=$(/usr/bin/dpkg-deb -f $1 Version)
+if $(builtin echo "$1" | /bin/grep -q '.deb') && $(builtin echo "$1" | /bin/grep -q '/'); then
+	pak=$(/usr/bin/dpkg-deb -f "$1" Package)
+	ver=$(/usr/bin/dpkg-deb -f "$1" Version)
+	arch=$(/usr/bin/dpkg-deb -f "$1" Architecture)
+	arch=$(grep -i "$arch" /etc/drauger-installer/arch.conf)
+	arch="$?"
 	if [ "$(/usr/bin/dpkg -s $pak 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
-		/bin/echo "This version of $pak is already installed."
+		builtin echo "This version of $pak is already installed."
 		/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer "/usr/bin/drauger-installer detected provided *.deb package was already installed." "drauger-installer" "$PWD" "$0"
+		exit 1
+	elif [ "$arch" != 0 ]; then
+		builtin echo "This package is not designed for your CPU Archetecture. It will not run correctly if installed."
 		exit 1
 	fi
 	des=$(/usr/bin/dpkg-deb -f "$1" Description)
 	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
 	#filter out already installed deps
-	dep=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
-	brk=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	dep=$(builtin echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	brk=$(builtin echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each in $dep; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
-			dep=$(/bin/echo "$dep" | /bin/sed "s/$each //")
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
+			dep=$(builtin echo "$dep" | /bin/sed "s/$each //")
 		fi
 	done
 	brklist=""
 	for each in $brk; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
 			if [ "$brklist" == "" ]; then
 				brklist="$each"
 			else
@@ -64,7 +70,7 @@ if $(/bin/echo "$1" | /bin/grep -q '.deb') && $(/bin/echo "$1" | /bin/grep -q '/
 	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ -z "$brk" ]; then
 		brk="None"
 	fi
-	if [ ! $(/bin/echo "$dep" | egrep -q '[a-zA-Z0-9]') ]; then
+	if [ ! $(builtin echo "$dep" | grep -Eq '[a-zA-Z0-9]') ]; then
 		dep="None"
 	fi
 	info="Package: $pak
@@ -85,14 +91,14 @@ Description: $des
 		action="install"
 		actioned="installed"
 	fi
-	info=$(/bin/echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
+	info=$(builtin echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
 	read -p "
 $info
 
 Would you like to $action this package? [y/N]: " ans
 	if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
 		{ 
-			/usr/bin/sudo /usr/bin/apt -y install "$1" && /bin/echo -e "\n$pak has been $actioned\n"
+			/usr/bin/sudo /usr/bin/apt -y install "$1" && builtin echo -e "\n$pak has been $actioned\n"
 		} && {
 			exit 0
 		} || {
@@ -103,29 +109,35 @@ Would you like to $action this package? [y/N]: " ans
 		/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
 		exit 1
 	fi
-elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
+elif $(builtin echo "$1" | /bin/grep -q '.deb'); then
 	pak=$(/usr/bin/dpkg-deb -f "$1" Package)
 	ver=$(/usr/bin/dpkg-deb -f "$1" Version)
+	arch=$(/usr/bin/dpkg-deb -f "$1" Architecture)
+	arch=$(grep -i "$arch" /etc/drauger-installer/arch.conf)
+	arch="$?"
 	if [ "$(/usr/bin/dpkg -s $pak 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
-		/bin/echo "This version of $pak is already installed."
+		builtin echo "This version of $pak is already installed."
 		/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer "/usr/bin/drauger-installer detected provided *.deb package was already installed." "drauger-installer" "$PWD" "$0"
+		exit 1
+	elif [ "$arch" != 0 ]; then
+		builtin echo "This package is not designed for your CPU Archetecture. It will not run correctly if installed."
 		exit 1
 	fi
 	des=$(/usr/bin/dpkg-deb -f "$1" Description)
 	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
 	#filter out already installed deps
-	dep=$(/bin/echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
-	brk=$(/bin/echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	dep=$(builtin echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	brk=$(builtin echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each in $dep; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
-			dep=$(/bin/echo "$dep" | /bin/sed "s/$each //")
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
+			dep=$(builtin echo "$dep" | /bin/sed "s/$each //")
 		fi
 	done
 	brklist=""
 	for each in $brk; do
-		if $(/bin/echo "$instlist" | /bin/grep -q "$each"); then
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
 			if [ "$brklist" == "" ]; then
 				brklist="$each"
 			else
@@ -137,7 +149,7 @@ elif $(/bin/echo "$1" | /bin/grep -q '.deb'); then
 	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ -z "$brk" ]; then
 		brk="None"
 	fi
-	if [ ! $(/bin/echo "$dep" | egrep -q '[a-zA-Z0-9]') ]; then
+	if [ ! $(builtin echo "$dep" | grep -Eq '[a-zA-Z0-9]') ]; then
 		dep="None"
 	fi
 	info="Package: $pak
@@ -158,7 +170,7 @@ Description: $des
 		action="install"
 		actioned="installed"
 	fi
-	info=$(/bin/echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
+	info=$(builtin echo "$info" | awk '{gsub(/.{125}/,"&\n")}1')
 	read -p "
 $info
 
