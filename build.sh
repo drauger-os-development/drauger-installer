@@ -6,8 +6,10 @@ FOLDER="$PAK\_$VERSION\_$ARCH"
 FOLDER=$(echo "$FOLDER" | sed 's/\\//g')
 if [ "$ARCH" == "amd64" ]; then
 	COMPILER="g++"
+	ARGS="-m64"
 elif [ "$ARCH" == "arm64" ]; then
 	COMPILER="aarch64-linux-gnu-g++"
+	ARGS=""
 fi
 mkdir ../"$FOLDER"
 ##############################################################
@@ -18,7 +20,7 @@ mkdir ../"$FOLDER"
 #							     #
 ##############################################################
 cd usr/share/drauger-installer
-"$COMPILER" -Wall -m64 -o "log-out" "log-out.cxx" && echo "log-out compiled successfully"
+$COMPILER $ARGS -Wall -o "log-out" "log-out.cxx" && echo "log-out compiled successfully"
 cd ../../..
 ##############################################################
 #							     #
@@ -91,7 +93,7 @@ rm drauger-installer/usr/share/drauger-installer/log-out
 #build the shit
 #build config
 if [ "$ARCH" == "amd64" ]; then
-	echo "amd64, x86_64, x86, i386, i486, all" > "$FOLDER"/etc/drauger-installer/arch.conf
+	echo "amd64, x86_64, x86, i386, i486, x64, all" > "$FOLDER"/etc/drauger-installer/arch.conf
 elif [ "$ARCH" == "arm64" ]; then
 	echo "arm64, arm, aarch64, aarch, armhf, all" > "$FOLDER"/etc/drauger-installer/arch.conf
 else
