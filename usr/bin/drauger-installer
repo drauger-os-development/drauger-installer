@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.4.5"
+version="0.4.6"
 set -o pipefail
 if [ "$1" == "--version" ] || [ "$1" == "-v" ]; then
 	builtin echo -e "\ndrauger-installer version $version\n"
@@ -48,8 +48,8 @@ if $(builtin echo "$1" | /bin/grep -q '.deb') && $(builtin echo "$1" | /bin/grep
 	dep=$(/usr/bin/dpkg-deb -f "$1" Depends)
 	brk=$(/usr/bin/dpkg-deb -f "$1" Breaks)
 	#filter out already installed deps
-	dep=$(builtin echo "$dep" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
-	brk=$(builtin echo "$brk" | /bin/sed 's/([^)(]*)//g' | /bin/sed 's/\,//g')
+	dep=$(builtin echo "$dep" | /bin/sed -e 's/([^()]*)//g' | /bin/sed 's/ , /, /g')
+	brk=$(builtin echo "$brk" | /bin/sed -e 's/([^()]*)//g' | /bin/sed 's/ , /, /g')
 	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
 	for each in $dep; do
 		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
