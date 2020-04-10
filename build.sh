@@ -4,6 +4,13 @@ PAK=$(cat DEBIAN/control | grep 'Package: ' | sed 's/Package: //g')
 ARCH=$(cat DEBIAN/control | grep 'Architecture: '| sed 's/Architecture: //g')
 FOLDER="$PAK\_$VERSION\_$ARCH"
 FOLDER=$(echo "$FOLDER" | sed 's/\\//g')
+if [ "$ARCH" == "amd64" ]; then
+	COMPILER="g++"
+	ARGS="-m64"
+elif [ "$ARCH" == "arm64" ]; then
+	COMPILER="aarch64-linux-gnu-g++"
+	ARGS=""
+fi
 mkdir ../"$FOLDER"
 ##############################################################
 #							     #
@@ -12,9 +19,9 @@ mkdir ../"$FOLDER"
 #							     #
 #							     #
 ##############################################################
-cd etc/drauger-installer
-g++ -Wall -m64 -o "log-out" "log-out.cxx"
-cd ../..
+cd usr/share/drauger-installer
+$COMPILER $ARGS -Wall -o "log-out" "log-out.cxx" && echo "log-out compiled successfully"
+cd ../../..
 ##############################################################
 #							     #
 #							     #
@@ -81,8 +88,16 @@ fi
 cp -R DEBIAN ../"$FOLDER"/DEBIAN
 cd ..
 #DELETE STUFF HERE
-rm "$FOLDER"/etc/drauger-installer/log-out.cxx
-rm drauger-installer/etc/drauger-installer/log-out
+rm "$FOLDER"/usr/share/drauger-installer/log-out.cxx
+rm drauger-installer/usr/share/drauger-installer/log-out
 #build the shit
+#build config
+if [ "$ARCH" == "amd64" ]; then
+	echo "amd64, x86_64, x86, i386, i486, x64, all" > "$FOLDER"/etc/drauger-installer/arch.conf
+elif [ "$ARCH" == "arm64" ]; then
+	echo "arm64, arm, aarch64, aarch, armhf, all" > "$FOLDER"/etc/drauger-installer/arch.conf
+else
+	echo "all" > "$FOLDER"/etc/drauger-installer/arch.conf
+fi
 dpkg-deb --build "$FOLDER"
 rm -rf "$FOLDER"

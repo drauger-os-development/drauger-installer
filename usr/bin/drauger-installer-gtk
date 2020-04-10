@@ -1,0 +1,257 @@
+#!/bin/bash
+# -*- coding: utf-8 -*-
+#
+#  drauger-installer-gtk
+#  
+#  Copyright 2020 Thomas Castleman <contact@draugeros.org>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#version flag
+version="0.4.6"
+set -o pipefail
+
+function translate ()
+{
+	VAR="$1"
+	CONCAT_1="$2"
+	CONCAT_2="$3"
+	if [ -d /etc/drauger-locales/"${LANG//.UTF-8/}" ]; then
+		FILE=$(grep -v '^#' /etc/drauger-locales/"${LANG//.UTF-8/}"/drauger-installer.conf)
+	else
+		FILE="None"
+	fi
+	if [ "$VAR" == "HELP" ] && [ "$FILE" == "None" ]; then
+		HELP="\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
+		return "$HELP"
+	elif [ "$VAR" == "HELP" ]; then
+		HELP=$(echo "$FILE" | grep "^HELP" | awk -F '"' '{print $2}')
+		return "$HELP"
+	fi
+	if [ "$VAR" == "already_installed" ] && [ "$FILE" == "None" ]; then
+		already_installed="This version of $CONCAT_1 is already installed."
+		return "$already_installed"
+	elif [ "$VAR" == "already_installed" ]; then
+		already_installed=$(echo "$FILE" | grep "^already_installed" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$already_installed"
+	fi
+	if [ "$VAR" == "version" ] && [ "$FILE" == "None" ]; then
+		version="Version: $CONCAT_1"
+		return "$version"
+	elif [ "$VAR" == "version" ]; then
+		version=$(echo "$FILE" | grep "^version" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$version"
+	fi
+	if [ "$VAR" == "needed_deps" ] && [ "$FILE" == "None" ]; then
+		needed_deps="Needed Dependencies: $CONCAT_1"
+	elif [ "$VAR" == "needed_deps" ]; then
+		needed_deps=$(echo "$FILE" | grep "^needed_deps" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$needed_deps"
+	fi
+	if [ "$VAR" == "conflicts" ] && [ "$FILE" == "None" ]; then
+		conflicts="Conflicts: $CONCAT_1"
+		return "$conflicts"
+	elif [ "$VAR" == "conflicts" ]; then
+		conflicts=$(echo "$FILE" | grep "^conflicts" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$conflicts"
+	fi
+	if [ "$VAR" == "desc" ] && [ "$FILE" == "None" ]; then
+		desc="Description: $CONCAT_1"
+		return "$desc"
+	elif [ "$VAR" == "desc" ]; then
+		desc=$(echo "$FILE" | grep "^desc" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$desc"
+	fi
+	if [ "$VAR" == "action_up" ] && [ "$FILE" == "None" ]; then
+		action_up="update"
+		return "$action_up"
+	elif [ "$VAR" == "action_up" ]; then
+		action_up=$(echo "$FILE" | grep "^action_up" | awk -F '"' '{print $2}')
+		return "$action_up"
+	fi
+	if [ "$VAR" == "actioned_up" ] && [ "$FILE" == "None" ]; then
+		actioned_up="updated"
+		return "$actioned_up"
+	elif [ "$VAR" == "actioned_up" ]; then
+		actioned_up=$(echo "$FILE" | grep "^actioned_up" | awk -F '"' '{print $2}')
+		return "$actioned_up"
+	fi
+	if [ "$VAR" == "actioning_up" ] && [ "$FILE" == "None" ]; then
+		actioning_up="updating"
+		return "$actioning_up"
+	elif [ "$VAR" == "actioning_up" ]; then
+		actioning_up=$(echo "$FILE" | grep "^actioning_up" | awk -F '"' '{print $2}')
+		return "$actioning_up"
+	fi
+	if [ "$VAR" == "action_inst" ] && [ "$FILE" == "None" ]; then
+		action_inst="install"
+		return "$action_inst"
+	elif [ "$VAR" == "action_inst" ]; then
+		action_inst=$(echo "$FILE" | grep "^action_inst" | awk -F '"' '{print $2}')
+		return "$action_inst"
+	fi
+	if [ "$VAR" == "actioned_inst" ] && [ "$FILE" == "None" ]; then
+		actioned_inst="installed"
+		return "$actioned_inst"
+	elif [ "$VAR" == "actioned_inst" ]; then
+		actioned_inst=$(echo "$FILE" | grep "^actioned_inst" | awk -F '"' '{print $2}')
+		return "$actioned_inst"
+	fi
+	if [ "$VAR" == "actioning_inst" ] && [ "$FILE" == "None" ]; then
+		actioning_inst="installing"
+		return "$actioning_inst"
+	elif [ "$VAR" == "actioning_inst" ]; then
+		actioning_inst=$(echo "$FILE" | grep "^actioning_inst" | awk -F '"' '{print $2}')
+		return "$actioning_inst"
+	fi
+	if [ "$VAR" == "confirm_cli" ] && [ "$FILE" == "None" ]; then
+		confirm_cli="Would you like to $CONCAT_1 this package? [y/N]: "
+		return "$confirm_cli"
+	elif [ "$VAR" == "confirm_cli" ]; then
+		confirm_cli=$(echo "$FILE" | grep "^confirm_cli" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$confirm_cli"
+	fi
+	if [ "$VAR" == "success" ] && [ "$FILE" == "None" ]; then
+		success="\n$CONCAT_1 has been $CONCAT_2\n"
+		return "$success"
+	elif [ "$VAR" == "success" ]; then
+		success=$(echo "$FILE" | grep "^success" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$actioned/$CONCAT_2/")
+		return "$success"
+	fi
+	if [ "$VAR" == "confirm_gui" ] && [ "$FILE" == "None" ]; then
+		confirm_gui="Package Info:\n\n\t$CONCAT_1\n\n\tWould you like to $CONCAT_2 this package?"
+		return "$confirm_gui"
+	elif [ "$VAR" == "confirm_gui" ]; then
+		confirm_gui=$(echo "$FILE" | grep "^confirm_gui" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$action/$CONCAT_2/")
+		return "$confirm_gui"
+	fi
+	if [ "$VAR" == "package" ] && [ "$FILE" == "None" ]; then
+		package="Package: $CONCAT_1"
+		return "$package"
+	elif [ "$VAR" == "package" ]; then
+		package=$(echo "$FILE" | grep "^package" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
+		return "$package"
+	fi
+	if [ "$VAR" == "arch_error" ] && [ "$FILE" == "None" ]; then
+		arch_error="\n\tThis package is not designed for your CPU Archetecture. It will not run correctly if installed.\t\n"
+		return "$arch_error"
+	elif [ "$VAR" == "arch_error" ]; then
+		arch_error=$(echo "$FILE" | grep "^arch_error" | awk -F '"' '{print $2}')
+		return "$arch_error"
+	fi
+}
+
+if [ "$1" == "--version" ] || [ "$1" == "-v" ]; then
+	builtin echo -e "\ndrauger-installer version $version\n"
+	exit 0
+fi
+#help flag
+if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+	builtin echo -e $(translate "HELP")
+	exit 0
+fi
+#if something is actually going to be installed, this will be ran
+install="$1"
+if [ "$install" == "" ] || [ "$install" == " " ] || [ -z ${install+x} ]; then
+	install=$(/usr/bin/python3 /usr/share/drauger-installer/splash.py 2>/dev/null)
+	if [ -z "$install" ]; then
+		/usr/share/drauger-installer/log-out 2 /usr/bin/drauger-installer-gtk "/usr/share/drauger-installer/splash.py exited with nothing on stdout. Most likly killed with no selection." "drauger-installer" "$PWD" "$0"  
+		exit 2
+	fi
+fi
+if [ "$?" == "1" ]; then
+	exit 1
+else
+	
+	pak=$(/usr/bin/dpkg-deb -f "$install" Package)
+	ver=$(/usr/bin/dpkg-deb -f "$install" Version)
+	arch=$(/usr/bin/dpkg-deb -f "$1" Architecture)
+	arch=$(grep -i "$arch" /etc/drauger-installer/arch.conf)
+	arch="$?"
+	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+		/usr/bin/python3 /usr/share/drauger-installer/error_ver.py "$pak"
+		exit 1
+	elif [ "$arch" != 0 ]; then
+		/usr/bin/python3 /usr/share/drauger-installer/error_arch.py
+		
+	fi
+	des=$(/usr/bin/dpkg-deb -f "$install" Description)
+	des=$(builtin echo "$des" | /usr/bin/awk '{gsub(/\n/,"&\t")}1')
+	dep=$(/usr/bin/dpkg-deb -f "$install" Depends)
+	brk=$(/usr/bin/dpkg-deb -f "$install" Breaks)
+	#filter out already installed deps
+	dep=$(builtin echo "$dep" | /bin/sed -e 's/([^()]*)//g' | /bin/sed 's/ , /, /g')
+	brk=$(builtin echo "$brk" | /bin/sed -e 's/([^()]*)//g' | /bin/sed 's/ , /, /g')
+	instlist=$(/usr/bin/dpkg -l | /bin/grep '^ii' | /usr/bin/awk '{print $2}')
+	for each in $dep; do
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
+			dep=$(builtin echo "$dep" | /bin/sed "s/$each //")
+		fi
+	done
+	brklist=""
+	for each in $brk; do
+		if $(builtin echo "$instlist" | /bin/grep -q "$each"); then
+			if [ "$brklist" == "" ]; then
+				brklist="$each"
+			else
+				brklist="$brklist $each"
+			fi
+		fi
+	done
+	brk="$brklist"
+	if [ "$brk" == "" ] || [ "$brk" == " " ] || [ -z "$brk" ]; then
+		brk="None"
+	fi
+	if [ ! $(builtin echo "$dep" | /bin/grep -Eq '[a-zA-Z0-9]') ]; then
+		dep="None"
+	fi
+	info="$(translate package $pak)
+
+$(translate version $ver)
+
+$(translate needed_deps $dep)
+
+$(translate conflicts $brk)
+
+$(translate desc $des)"
+fi
+if $(/usr/bin/dpkg -l "$pak" 2>/dev/null| /bin/grep -q "$pak"); then
+	action=$(translate "action_up")
+	actioned=$(translate "actioned_up")
+	actioning=$(translate "actioning_up")
+else
+	action=$(translate "action_inst")
+	actioned=$(translate "actioned_inst")
+	actioning=$(translate "actioning_inst")
+fi
+info=$(builtin echo "$info" | /usr/bin/awk '{gsub(/.{125}/,"& \t \n \t")}1')
+/usr/bin/python3 /usr/share/drauger-installer/confirm.py "$info" "$action"
+x="$?"
+if [ "$x" == "0" ]; then
+	{
+		{
+		 	/usr/bin/pkexec /usr/bin/apt -y install "$install" | /usr/bin/zenity --progress --pulsate --auto-close --no-cancel --text="$actioning $pak . . ." 
+		 
+		} && {
+			/usr/bin/notify-send --icon=/usr/share/icons/Drauger/720x720/Menus/install-drauger.png --app-name="Drauger Installer" $(translate "success" "$pak" "$actioned")
+		}
+	} || {
+		/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
+	}
+else
+	/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer-gtk "/usr/share/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled." "drauger-installer" "$PWD" "$0"
+	exit 1
+fi
