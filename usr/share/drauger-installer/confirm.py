@@ -25,9 +25,54 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from sys import argv
+from os import getenv
 
 info=argv[1]
 action=argv[2]
+
+LANG = list(getenv("LANG"))
+length = len(LANG) - 1
+while (length >= 4):
+	del(LANG[length])
+	length = length - 1
+LANG = "".join(LANG)
+
+try:
+	with open("/etc/drauger-locales/%s/drauger-installer.conf", "r") as FILE:
+		contents = FILE.read()
+	contents = contents.split("\n")
+	for each in range(len(contents)):
+		contents[each] = list(contents[each])
+	length = len(contents) - 1
+	while (length >= 0):
+		if ((contents[length] == []) or (contents[length][0] == "#")):
+			del(contents[length])
+		length = length - 1
+	for each in range(len(contents)):
+		contents[each] = "".join(contents[each])
+	for each in contents:
+		if (each[0] == "confirm_gui"):
+			confirm = each[1]
+		elif (each[0] == "YES"):
+			YES = each[1]
+		elif (each[0] == "NO"):
+			NO = each[1]
+	confirm = confirm.split("$info")
+	confirm = "%s".join(confirm)
+	confirm = confirm.split("$action")
+	confirm = "%s".join(confirm)
+	confirm = confirm % (info, action)
+
+except:
+	confirm = """
+	Package Info:
+
+	%s
+
+	Would you like to %s this package?
+	""" % (info, action)
+	YES = "YES"
+	NO = "NO"
 
 class confirm(Gtk.Window):
 	def __init__(self):
@@ -36,21 +81,15 @@ class confirm(Gtk.Window):
 			self.add(self.grid)
 
 			self.label = Gtk.Label()
-			self.label.set_markup("""
-	Package Info:
-
-	%s
-
-	Would you like to %s this package?
-	""" % (info, action))
+			self.label.set_markup(confirm)
 			self.label.set_justify(Gtk.Justification.LEFT)
 			self.grid.attach(self.label, 1, 1, 8, 1)
 
-			self.button1 = Gtk.Button.new_with_label("YES")
+			self.button1 = Gtk.Button.new_with_label(YES)
 			self.button1.connect("clicked", self.onyesclicked)
 			self.grid.attach(self.button1, 7, 2, 1, 1)
 
-			self.button1 = Gtk.Button.new_with_label("NO")
+			self.button1 = Gtk.Button.new_with_label(NO)
 			self.button1.connect("clicked", self.onnoclicked)
 			self.grid.attach(self.button1, 5, 2, 1, 1)
 

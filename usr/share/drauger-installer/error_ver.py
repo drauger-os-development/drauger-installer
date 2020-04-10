@@ -25,8 +25,42 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from sys import argv
+from os import getenv
 
 pak=argv[1]
+
+LANG = list(getenv("LANG"))
+length = len(LANG) - 1
+while (length >= 4):
+	del(LANG[length])
+	length = length - 1
+LANG = "".join(LANG)
+
+try:
+	with open("/etc/drauger-locales/%s/drauger-installer.conf", "r") as FILE:
+		contents = FILE.read()
+	contents = contents.split("\n")
+	for each in range(len(contents)):
+		contents[each] = list(contents[each])
+	length = len(contents) - 1
+	while (length >= 0):
+		if ((contents[length] == []) or (contents[length][0] == "#")):
+			del(contents[length])
+		length = length - 1
+	for each in range(len(contents)):
+		contents[each] = "".join(contents[each])
+	for each in contents:
+		if (each[0] == "already_installed"):
+			confirm = each[1]
+		elif (each[0] == "EXIT"):
+			EXIT = each[1]
+	confirm = confirm.split("$pak")
+	confirm = "%s".join(confirm)
+	confirm = confirm % (pak)
+
+except:
+	confirm = "\n\tThis version of %s is already installed.\t\n" % (pak)
+	EXIT = "EXIT"
 
 class error(Gtk.Window):
 	def __init__(self):
@@ -35,13 +69,11 @@ class error(Gtk.Window):
 			self.add(self.grid)
 
 			self.label = Gtk.Label()
-			self.label.set_markup("""
-	This version of %s is already installed.
-	""" % (pak))
+			self.label.set_markup(confirm)
 			self.label.set_justify(Gtk.Justification.CENTER)
 			self.grid.attach(self.label, 1, 1, 8, 1)
 
-			self.button1 = Gtk.Button.new_with_label("EXIT")
+			self.button1 = Gtk.Button.new_with_label(EXIT)
 			self.button1.connect("clicked", self.onexitclicked)
 			self.grid.attach(self.button1, 7, 2, 1, 1)
 

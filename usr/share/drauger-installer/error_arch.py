@@ -24,6 +24,37 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
+from os import getenv
+
+LANG = list(getenv("LANG"))
+length = len(LANG) - 1
+while (length >= 4):
+	del(LANG[length])
+	length = length - 1
+LANG = "".join(LANG)
+
+try:
+	with open("/etc/drauger-locales/%s/drauger-installer.conf", "r") as FILE:
+		contents = FILE.read()
+	contents = contents.split("\n")
+	for each in range(len(contents)):
+		contents[each] = list(contents[each])
+	length = len(contents) - 1
+	while (length >= 0):
+		if ((contents[length] == []) or (contents[length][0] == "#")):
+			del(contents[length])
+		length = length - 1
+	for each in range(len(contents)):
+		contents[each] = "".join(contents[each])
+	for each in contents:
+		if (each[0] == "arch_error"):
+			confirm = each[1]
+		elif (each[0] == "EXIT"):
+			EXIT = each[1]
+
+except:
+	confirm = "\n\tThis package is not designed for your CPU Archetecture. It will not run correctly if installed.\t\n"
+	EXIT = "EXIT"
 
 class error(Gtk.Window):
 	def __init__(self):
@@ -32,13 +63,11 @@ class error(Gtk.Window):
 			self.add(self.grid)
 
 			self.label = Gtk.Label()
-			self.label.set_markup("""
-	This package is not designed for your CPU Archetecture. It will not run correctly if installed.
-	""")
+			self.label.set_markup(confirm)
 			self.label.set_justify(Gtk.Justification.CENTER)
 			self.grid.attach(self.label, 1, 1, 8, 1)
 
-			self.button1 = Gtk.Button.new_with_label("EXIT")
+			self.button1 = Gtk.Button.new_with_label(EXIT)
 			self.button1.connect("clicked", self.onexitclicked)
 			self.grid.attach(self.button1, 7, 2, 1, 1)
 
