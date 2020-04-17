@@ -115,15 +115,10 @@ function translate ()
 		return "$actioning_inst"
 	elif [ "$VAR" == "actioning_inst" ]; then
 		actioning_inst=$(echo "$FILE" | grep "^actioning_inst" | awk -F '"' '{print $2}')
-		return "$actioning_inst"
+		builtin echo "$actioning_inst"
 	fi
-	if [ "$VAR" == "confirm_cli" ] && [ "$FILE" == "None" ]; then
-		confirm_cli="Would you like to $CONCAT_1 this package? [y/N]: "
-		return "$confirm_cli"
-	elif [ "$VAR" == "confirm_cli" ]; then
-		confirm_cli=$(echo "$FILE" | grep "^confirm_cli" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$confirm_cli"
-	fi
+	#pulled out support for CLI confirmation dialog as this is a GUI-back-end file
+	#CLI code is not necessary here.
 	if [ "$VAR" == "success" ] && [ "$FILE" == "None" ]; then
 		success="\n$CONCAT_1 has been $CONCAT_2\n"
 		return "$success"

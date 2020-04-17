@@ -128,15 +128,10 @@ function translate ()
 		return "$success"
 	elif [ "$VAR" == "success" ]; then
 		success=$(echo "$FILE" | grep "^success" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$actioned/$CONCAT_2/")
-		return "$success"
+		builtin echo "$success"
 	fi
-	if [ "$VAR" == "confirm_gui" ] && [ "$FILE" == "None" ]; then
-		confirm_gui="Package Info:\n\n\t$CONCAT_1\n\n\tWould you like to $CONCAT_2 this package?"
-		return "$confirm_gui"
-	elif [ "$VAR" == "confirm_gui" ]; then
-		confirm_gui=$(echo "$FILE" | grep "^confirm_gui" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$action/$CONCAT_2/")
-		return "$confirm_gui"
-	fi
+	#pulled out support for GUI confirmation dialog as this is a CLI file
+	#GUI code is not necessary here.
 	if [ "$VAR" == "package" ] && [ "$FILE" == "None" ]; then
 		package="Package: $CONCAT_1"
 		return "$package"
