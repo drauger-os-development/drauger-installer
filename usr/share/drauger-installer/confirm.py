@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  error.py
+#  confirm.py
 #
 #  Copyright 2020 Thomas Castleman <contact@draugeros.org>
 #
@@ -74,7 +74,7 @@ except:
 	YES = "YES"
 	NO = "NO"
 
-class confirm(Gtk.Window):
+class confirm_UI(Gtk.Window):
 	def __init__(self):
 			Gtk.Window.__init__(self, title="Drauger Installer")
 			self.grid=Gtk.Grid(orientation=Gtk.Orientation.VERTICAL,)
@@ -100,7 +100,7 @@ class confirm(Gtk.Window):
 		exit(1)
 
 def show_conf():
-	window = confirm()
+	window = confirm_UI()
 	window.set_decorated(True)
 	window.set_resizable(False)
 	window.set_position(Gtk.WindowPosition.CENTER)
