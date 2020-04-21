@@ -59,6 +59,7 @@ except:
 class splash(Gtk.Window):
 		def __init__(self):
 			Gtk.Window.__init__(self, title="Drauger Installer")
+			self.set_icon_from_file("/usr/share/icons/Drauger/720x720/Menus/install-drauger.png")
 			self.grid=Gtk.Grid(orientation=Gtk.Orientation.VERTICAL,)
 			self.add(self.grid)
 

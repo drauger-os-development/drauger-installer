@@ -78,6 +78,7 @@ class confirm_UI(Gtk.Window):
 	def __init__(self):
 			Gtk.Window.__init__(self, title="Drauger Installer")
 			self.grid=Gtk.Grid(orientation=Gtk.Orientation.VERTICAL,)
+			self.set_icon_from_file("/usr/share/icons/Drauger/720x720/Menus/install-drauger.png")
 			self.add(self.grid)
 
 			self.label = Gtk.Label()
