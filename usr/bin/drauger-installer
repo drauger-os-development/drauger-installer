@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.4.6"
+version="0.5.0"
 set -o pipefail
 
 function translate ()
@@ -35,121 +35,116 @@ function translate ()
 	fi
 	if [ "$VAR" == "HELP" ] && [ "$FILE" == "None" ]; then
 		HELP="\nJust run drauger-installer-gtk to get a GUI installer for a *.deb package.\nOr, pass drauger-installer the file path to install via a CLI.\n"
-		return "$HELP"
+		builtin echo "$HELP"
 	elif [ "$VAR" == "HELP" ]; then
 		HELP=$(echo "$FILE" | grep "^HELP" | awk -F '"' '{print $2}')
-		return "$HELP"
+		builtin echo "$HELP"
 	fi
 	if [ "$VAR" == "already_installed" ] && [ "$FILE" == "None" ]; then
 		already_installed="This version of $CONCAT_1 is already installed."
-		return "$already_installed"
+		builtin echo "$already_installed"
 	elif [ "$VAR" == "already_installed" ]; then
 		already_installed=$(echo "$FILE" | grep "^already_installed" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$already_installed"
+		builtin echo "$already_installed"
 	fi
 	if [ "$VAR" == "version" ] && [ "$FILE" == "None" ]; then
 		version="Version: $CONCAT_1"
-		return "$version"
+		builtin echo "$version"
 	elif [ "$VAR" == "version" ]; then
 		version=$(echo "$FILE" | grep "^version" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$version"
+		builtin echo "$version"
 	fi
 	if [ "$VAR" == "needed_deps" ] && [ "$FILE" == "None" ]; then
 		needed_deps="Needed Dependencies: $CONCAT_1"
 	elif [ "$VAR" == "needed_deps" ]; then
 		needed_deps=$(echo "$FILE" | grep "^needed_deps" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$needed_deps"
+		builtin echo "$needed_deps"
 	fi
 	if [ "$VAR" == "conflicts" ] && [ "$FILE" == "None" ]; then
 		conflicts="Conflicts: $CONCAT_1"
-		return "$conflicts"
+		builtin echo "$conflicts"
 	elif [ "$VAR" == "conflicts" ]; then
 		conflicts=$(echo "$FILE" | grep "^conflicts" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$conflicts"
+		builtin echo "$conflicts"
 	fi
 	if [ "$VAR" == "desc" ] && [ "$FILE" == "None" ]; then
 		desc="Description: $CONCAT_1"
-		return "$desc"
+		builtin echo "$desc"
 	elif [ "$VAR" == "desc" ]; then
 		desc=$(echo "$FILE" | grep "^desc" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$desc"
+		builtin echo "$desc"
 	fi
 	if [ "$VAR" == "action_up" ] && [ "$FILE" == "None" ]; then
 		action_up="update"
-		return "$action_up"
+		builtin echo "$action_up"
 	elif [ "$VAR" == "action_up" ]; then
 		action_up=$(echo "$FILE" | grep "^action_up" | awk -F '"' '{print $2}')
-		return "$action_up"
+		builtin echo "$action_up"
 	fi
 	if [ "$VAR" == "actioned_up" ] && [ "$FILE" == "None" ]; then
 		actioned_up="updated"
-		return "$actioned_up"
+		builtin echo "$actioned_up"
 	elif [ "$VAR" == "actioned_up" ]; then
 		actioned_up=$(echo "$FILE" | grep "^actioned_up" | awk -F '"' '{print $2}')
-		return "$actioned_up"
+		builtin echo "$actioned_up"
 	fi
 	if [ "$VAR" == "actioning_up" ] && [ "$FILE" == "None" ]; then
 		actioning_up="updating"
-		return "$actioning_up"
+		builtin echo "$actioning_up"
 	elif [ "$VAR" == "actioning_up" ]; then
 		actioning_up=$(echo "$FILE" | grep "^actioning_up" | awk -F '"' '{print $2}')
-		return "$actioning_up"
+		builtin echo "$actioning_up"
 	fi
 	if [ "$VAR" == "action_inst" ] && [ "$FILE" == "None" ]; then
 		action_inst="install"
-		return "$action_inst"
+		builtin echo "$action_inst"
 	elif [ "$VAR" == "action_inst" ]; then
 		action_inst=$(echo "$FILE" | grep "^action_inst" | awk -F '"' '{print $2}')
-		return "$action_inst"
+		builtin echo "$action_inst"
 	fi
 	if [ "$VAR" == "actioned_inst" ] && [ "$FILE" == "None" ]; then
 		actioned_inst="installed"
-		return "$actioned_inst"
+		builtin echo "$actioned_inst"
 	elif [ "$VAR" == "actioned_inst" ]; then
 		actioned_inst=$(echo "$FILE" | grep "^actioned_inst" | awk -F '"' '{print $2}')
-		return "$actioned_inst"
+		builtin echo "$actioned_inst"
 	fi
 	if [ "$VAR" == "actioning_inst" ] && [ "$FILE" == "None" ]; then
 		actioning_inst="installing"
-		return "$actioning_inst"
+		builtin echo "$actioning_inst"
 	elif [ "$VAR" == "actioning_inst" ]; then
 		actioning_inst=$(echo "$FILE" | grep "^actioning_inst" | awk -F '"' '{print $2}')
-		return "$actioning_inst"
+		builtin echo "$actioning_inst"
 	fi
 	if [ "$VAR" == "confirm_cli" ] && [ "$FILE" == "None" ]; then
-		confirm_cli="Would you like to $CONCAT_1 this package? [y/N]: "
-		return "$confirm_cli"
+		confirm_cli="Would you like to $CONCAT_1 this package?"
+		builtin echo "$confirm_cli"
 	elif [ "$VAR" == "confirm_cli" ]; then
 		confirm_cli=$(echo "$FILE" | grep "^confirm_cli" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$confirm_cli"
+		builtin echo "$confirm_cli"
 	fi
 	if [ "$VAR" == "success" ] && [ "$FILE" == "None" ]; then
 		success="\n$CONCAT_1 has been $CONCAT_2\n"
-		return "$success"
+		builtin echo "$success"
 	elif [ "$VAR" == "success" ]; then
 		success=$(echo "$FILE" | grep "^success" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$actioned/$CONCAT_2/")
-		return "$success"
+		builtin echo "$success"
 	fi
-	if [ "$VAR" == "confirm_gui" ] && [ "$FILE" == "None" ]; then
-		confirm_gui="Package Info:\n\n\t$CONCAT_1\n\n\tWould you like to $CONCAT_2 this package?"
-		return "$confirm_gui"
-	elif [ "$VAR" == "confirm_gui" ]; then
-		confirm_gui=$(echo "$FILE" | grep "^confirm_gui" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$action/$CONCAT_2/")
-		return "$confirm_gui"
-	fi
+	#pulled out support for GUI confirmation dialog as this is a CLI file
+	#GUI code is not necessary here.
 	if [ "$VAR" == "package" ] && [ "$FILE" == "None" ]; then
 		package="Package: $CONCAT_1"
-		return "$package"
+		builtin echo "$package"
 	elif [ "$VAR" == "package" ]; then
 		package=$(echo "$FILE" | grep "^package" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/")
-		return "$package"
+		builtin echo "$package"
 	fi
 	if [ "$VAR" == "arch_error" ] && [ "$FILE" == "None" ]; then
 		arch_error="\n\tThis package is not designed for your CPU Archetecture. It will not run correctly if installed.\t\n"
-		return "$arch_error"
+		builtin echo "$arch_error"
 	elif [ "$VAR" == "arch_error" ]; then
 		arch_error=$(echo "$FILE" | grep "^arch_error" | awk -F '"' '{print $2}')
-		return "$arch_error"
+		builtin echo "$arch_error"
 	fi
 	
 }
