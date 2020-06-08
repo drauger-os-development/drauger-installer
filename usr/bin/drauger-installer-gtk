@@ -21,7 +21,7 @@
 #  MA 02110-1301, USA.
 #
 #version flag
-version="0.5.0"
+version="0.5.1"
 set -o pipefail
 
 function translate ()
@@ -120,7 +120,7 @@ function translate ()
 	#pulled out support for CLI confirmation dialog as this is a GUI-back-end file
 	#CLI code is not necessary here.
 	if [ "$VAR" == "success" ] && [ "$FILE" == "None" ]; then
-		success="\n$CONCAT_1 has been $CONCAT_2\n"
+		success="$CONCAT_1 has been $CONCAT_2"
 		builtin echo "$success"
 	elif [ "$VAR" == "success" ]; then
 		success=$(echo "$FILE" | grep "^success" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$actioned/$CONCAT_2/")
