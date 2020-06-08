@@ -176,7 +176,7 @@ else
 	arch=$(/usr/bin/dpkg-deb -f "$1" Architecture)
 	arch=$(grep -i "$arch" /etc/drauger-installer/arch.conf)
 	arch="$?"
-	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+	if [ "$(/usr/bin/dpkg -s "$pak" 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/usr/bin/python3 /usr/share/drauger-installer/error_ver.py "$pak"
 		exit 1
 	elif [ "$arch" != 0 ]; then
