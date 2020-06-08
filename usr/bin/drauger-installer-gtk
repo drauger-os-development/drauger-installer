@@ -241,10 +241,14 @@ if [ "$x" == "0" ]; then
 		 	/usr/bin/pkexec /usr/bin/apt -y install "$install" | /usr/bin/zenity --progress --pulsate --auto-close --no-cancel --text="$actioning $pak . . ." 
 		 
 		} && {
-			/usr/bin/notify-send --icon=/usr/share/icons/Drauger/720x720/Menus/install-drauger.png --app-name="Drauger Installer" $(translate "success" "$pak" "$actioned")
+			/usr/bin/notify-send --icon="/usr/share/icons/Drauger/720x720/Menus/install-drauger.png" --app-name="Drauger Installer" "$(translate 'success' $pak $actioned)"
 		}
 	} || {
-		/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
+		if [ "$?" != "1" ]; then
+			/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
+		else
+			/usr/bin/notify-send --icon="/usr/share/icons/Drauger/720x720/Menus/install-drauger.png" --app-name="Drauger Installer" "$(translate 'success' $pak $actioned)"
+		fi
 	}
 else
 	/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer-gtk "/usr/share/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled." "drauger-installer" "$PWD" "$0"
