@@ -21,7 +21,7 @@
 #  MA 02110-1301, USA.
 #
 #version flag
-version="0.5.0"
+version="0.5.1"
 set -o pipefail
 
 function translate ()
@@ -120,7 +120,7 @@ function translate ()
 	#pulled out support for CLI confirmation dialog as this is a GUI-back-end file
 	#CLI code is not necessary here.
 	if [ "$VAR" == "success" ] && [ "$FILE" == "None" ]; then
-		success="\n$CONCAT_1 has been $CONCAT_2\n"
+		success="$CONCAT_1 has been $CONCAT_2"
 		builtin echo "$success"
 	elif [ "$VAR" == "success" ]; then
 		success=$(echo "$FILE" | grep "^success" | awk -F '"' '{print $2}' | sed "s/\$pak/$CONCAT_1/" | sed "s/\$actioned/$CONCAT_2/")
@@ -176,7 +176,7 @@ else
 	arch=$(/usr/bin/dpkg-deb -f "$1" Architecture)
 	arch=$(grep -i "$arch" /etc/drauger-installer/arch.conf)
 	arch="$?"
-	if [ "$(/usr/bin/dpkg -s "$pak" | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
+	if [ "$(/usr/bin/dpkg -s "$pak" 2>/dev/null | /bin/grep 'Version: ' | /bin/sed 's/Version: //g')" == "$ver" ]; then
 		/usr/bin/python3 /usr/share/drauger-installer/error_ver.py "$pak"
 		exit 1
 	elif [ "$arch" != 0 ]; then
@@ -241,10 +241,14 @@ if [ "$x" == "0" ]; then
 		 	/usr/bin/pkexec /usr/bin/apt -y install "$install" | /usr/bin/zenity --progress --pulsate --auto-close --no-cancel --text="$actioning $pak . . ." 
 		 
 		} && {
-			/usr/bin/notify-send --icon=/usr/share/icons/Drauger/720x720/Menus/install-drauger.png --app-name="Drauger Installer" $(translate "success" "$pak" "$actioned")
+			/usr/bin/notify-send --icon="/usr/share/icons/Drauger/720x720/Menus/install-drauger.png" --app-name="Drauger Installer" "$(translate 'success' $pak $actioned)"
 		}
 	} || {
-		/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
+		if [ "$?" != "1" ]; then
+			/usr/bin/python3 /usr/share/drauger-installer/error_inst.py "$actioning" "$?"
+		else
+			/usr/bin/notify-send --icon="/usr/share/icons/Drauger/720x720/Menus/install-drauger.png" --app-name="Drauger Installer" "$(translate 'success' $pak $actioned)"
+		fi
 	}
 else
 	/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer-gtk "/usr/share/drauger-installer/confirm.py exited with non-zero value. Most likly installation canceled." "drauger-installer" "$PWD" "$0"

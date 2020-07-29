@@ -20,7 +20,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-version="0.5.0"
+version="0.5.1"
 set -o pipefail
 
 function translate ()
@@ -229,8 +229,13 @@ $(translate confirm_cli $action) [y/N]: " ans
 		} && {
 			exit 0
 		} || {
-			/usr/share/drauger-installer/log-out 2 /usr/bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
-			exit 2
+			if [ "$?" != "1" ]; then
+				/usr/share/drauger-installer/log-out 2 /usr/bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
+				exit 2
+			else
+				builtin echo -e $(translate "success" "$pak" "$actioned")
+				exit 0
+			fi
 		}
 	else
 		/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
@@ -308,8 +313,13 @@ $(translate confirm_cli $action) [y/N]: " ans
 		} && {
 			exit 0
 		} || {
-			/usr/share/drauger-installer/log-out 2 /usr/bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
-			exit 2
+			if [ "$?" != "1" ]; then
+				/usr/share/drauger-installer/log-out 2 /usr/bin/drauger-installer "Installation of provided *.deb package $1 failed." "drauger-installer" "$PWD" "$0"
+				exit 2
+			else
+				builtin echo -e $(translate "success" "$pak" "$actioned")
+				exit 0
+			fi
 		}
 	else
 		/usr/share/drauger-installer/log-out 1 /usr/bin/drauger-installer "Installation Canceled" "drauger-installer" "$PWD" "$0"
